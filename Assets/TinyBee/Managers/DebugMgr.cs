@@ -55,14 +55,14 @@
 		public void OnGUI()
 		{
 			//計算縮放倍率
-			float vRate = (float)Screen.width / (float)(UIMgr.Instance.RealWidth == 0f ? 960f : UIMgr.Instance.RealWidth);
+			float rate = (float)Screen.width / (float)(UIMgr.Instance.RealWidth == 0f ? 960f : UIMgr.Instance.RealWidth);
 
 			//縮放倍率不可小於1
-			if (vRate < 1f)
-				vRate = 1f;
+			if (rate < 1f)
+				rate = 1f;
 
 			//設置新的縮放比
-			GUI.matrix = Matrix4x4.TRS(new Vector3(0, 0, 0), Quaternion.identity, Vector3.one * vRate);
+			GUI.matrix = Matrix4x4.TRS(new Vector3(0, 0, 0), Quaternion.identity, Vector3.one * rate);
 
 			//設定控制元件 依照 Table排列
 			GUILayout.BeginVertical();
@@ -95,53 +95,49 @@
         private TWindow GetWindow(int id)
         {
             TWindow window;
-            if (mWindowTable.TryGetValue(id, out window))
-            {
-                return window;
-            }
-            else
-            {
-                return null;
-            }
+			if (!mWindowTable.TryGetValue(id, out window))
+				return null;
+
+			return window;
         }
 
         //取得GUIStyle
-        private GUIStyle GetGUIStyle(GUIStyle vStyle, int vKind, long vValue)
+        private GUIStyle GetGUIStyle(GUIStyle style, int kind, long value)
         {
-            return GetGUIStyle(vStyle, vKind, (int)vValue);
+			return GetGUIStyle(style, kind, (int)value);
         }
 
         //取得GUIStyle
-        private GUIStyle GetGUIStyle(GUIStyle vStyle, int vKind, float vValue)
+		private GUIStyle GetGUIStyle(GUIStyle style, int kind, float value)
         {
-            return GetGUIStyle(vStyle, vKind, (int)vValue);
+			return GetGUIStyle(style, kind, (int)value);
         }
 
         //取得GUIStyle
-        private GUIStyle GetGUIStyle(GUIStyle vStyle, int vKind, int vValue)
+		private GUIStyle GetGUIStyle(GUIStyle style, int kind, int value)
         {
-            switch (vKind)
+			switch (kind)
             {
                 case 1:
-                    if (vValue >= 50)
-                        vStyle.normal.textColor = Color.yellow;
-                    else if (vValue > 25 && vValue < 50)
-                        vStyle.normal.textColor = Color.white;
-                    else if (vValue <= 25)
-                        vStyle.normal.textColor = Color.red;
-                    return vStyle;
+					if (value >= 50)
+						style.normal.textColor = Color.yellow;
+					else if (value > 25 && value < 50)
+						style.normal.textColor = Color.white;
+					else if (value <= 25)
+						style.normal.textColor = Color.red;
+					return style;
                 case 2:
-                    if (vValue <= 200)
-                        vStyle.normal.textColor = Color.green;
-                    else if (vValue > 200 && vValue <= 500)
-                        vStyle.normal.textColor = Color.white;
-                    else if (vValue > 500 && vValue < 1000)
-                        vStyle.normal.textColor = Color.yellow;
-                    else if (vValue >= 1000)
-                        vStyle.normal.textColor = Color.red;
-                    return vStyle;
+					if (value <= 200)
+						style.normal.textColor = Color.green;
+					else if (value > 200 && value <= 500)
+						style.normal.textColor = Color.white;
+					else if (value > 500 && value < 1000)
+						style.normal.textColor = Color.yellow;
+					else if (value >= 1000)
+						style.normal.textColor = Color.red;
+					return style;
                 default:
-                    return vStyle;
+					return style;
             }
         }
 
@@ -153,32 +149,32 @@
             mWindowTable.Add(key, window);
         }
 
-        public void Log(string vMsg)
+        public void Log(string msg)
         {
             MsgWindow window = GetWindow(WindowEnumBase.Msg) as MsgWindow;
             if (window != null)
-                window.Log(vMsg);
+				window.Log(msg);
         }
 
-        public void LogWarning(string vMsg)
+		public void LogWarning(string msg)
         {
             MsgWindow window = GetWindow(WindowEnumBase.Msg) as MsgWindow;
             if (window != null)
-                window.LogWarning(vMsg);
+				window.LogWarning(msg);
         }
 
-        public void LogError(string vMsg)
+		public void LogError(string msg)
         {
             MsgWindow window = GetWindow(WindowEnumBase.Msg) as MsgWindow;
             if (window != null)
-                window.LogError(vMsg);
+				window.LogError(msg);
         }
 
-        public void LogException(string vMsg)
+		public void LogException(string msg)
         {
             MsgWindow window = GetWindow(WindowEnumBase.Msg) as MsgWindow;
             if (window != null)
-                window.LogException(vMsg);
+				window.LogException(msg);
         }
     }
 }

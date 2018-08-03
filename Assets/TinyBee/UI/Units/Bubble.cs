@@ -91,43 +91,39 @@
             GameObject.Destroy(gameObject, mSpeed + 1f);
         }
 
-        public static void Begin(GameObject vObj, Vector3 vStartPos, Vector3 vEndPos, string vText, float vSpeed = 1f, float vDelay = 0f, eBubbleType vType = eBubbleType.Bubble, UISprite vBackground = null)
+        public static void Begin(GameObject obj, Vector3 startPos, Vector3 endPos, string text, float speed = 1f, float delay = 0f, eBubbleType type = eBubbleType.Bubble, UISprite background = null)
         {
-            Bubble vBubble = vObj.AddComponent<Bubble>();
-
-            if (vBubble != null)
+			Bubble bubble = obj.AddComponent<Bubble>();
+			if (bubble != null)
             {
-                vBubble.StartPosition = vStartPos;
-                vBubble.EndPosition = vEndPos;
-                vBubble.Text = vText;
-                vBubble.Type = vType;
-                vBubble.Speed = vSpeed;
-                vBubble.Delay = vDelay;
-                vBubble.Run();
+				bubble.StartPosition = startPos;
+				bubble.EndPosition = endPos;
+				bubble.Text = text;
+				bubble.Type = type;
+				bubble.Speed = speed;
+				bubble.Delay = delay;
+				bubble.Run();
 
-                if (vBackground != null)
+				if (background != null)
                 {
-                    string[] vStr = vText.Split('\n');
-
-                    if (vStr.Length > 0)
+					string[] strs = text.Split('\n');
+					if (strs.Length > 0)
                     {
-                        int vMax = 0;
-                        int vCount = 0;
-                        for (int i = 0; i < vStr.Length; i++)
+                        int max = 0;
+                        int count = 0;
+						for (int i = 0; i < strs.Length; i++)
                         {
-                            vCount = vStr[i].GetStringLength();
-
-                            if (vCount > vMax)
-                                vMax = vCount;
+							count = strs[i].GetStringLength();
+							if (count > max)
+								max = count;
                         }
-
-                        vBackground.height = vBubble.Height + vBubble.Size;
-                        vBackground.width = vMax * vBubble.Size / 2 + vBubble.Size;
+						background.height = bubble.Height + bubble.Size;
+						background.width = max * bubble.Size / 2 + bubble.Size;
                     }
                     else
                     {
-                        vBackground.height = vBubble.Height + vBubble.Size;
-                        vBackground.width = vBubble.Width + vBubble.Size;
+						background.height = bubble.Height + bubble.Size;
+						background.width = bubble.Width + bubble.Size;
                     }
                 }
             }

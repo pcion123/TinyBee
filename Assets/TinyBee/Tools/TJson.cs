@@ -3,9 +3,9 @@
 	public static class TJson : object
 	{
 		//Json反序列化
-		public static T DeserializeObject<T> (string vJson)
+		public static T DeserializeObject<T> (string json)
 		{
-			return LitJson.JsonMapper.ToObject<T>(vJson);
+			return LitJson.JsonMapper.ToObject<T>(json);
 		}
 
 		//Json序列化

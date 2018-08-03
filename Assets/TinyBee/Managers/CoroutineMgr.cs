@@ -71,50 +71,48 @@
 
 		private IEnumerator Runner()
 		{
-			bool vIsTimeup = false;
-			DateTime vTimer = DateTime.Now;
+			bool isTimeup = false;
+			DateTime timer = DateTime.Now;
 
 			yield return null;
 
-			IEnumerator vEnumerator = mEnumerator;
+			IEnumerator enumerator = mEnumerator;
 
 			while (mIsRunning)
 			{
 				if (mTimer > 0)
 				{
-					System.TimeSpan vTsc = DateTime.Now - vTimer;
-
-					if (vTsc.Seconds > mTimer)
+					System.TimeSpan tsc = DateTime.Now - timer;
+					if (tsc.Seconds > mTimer)
 					{
-						vIsTimeup = true;
+						isTimeup = true;
 						break;
 					}
 				}
 
-				if (mIsPaused == true)
+				if (mIsPaused)
 				{
 					yield return null;
 				}
 				else
 				{
-					bool vIsOver = false;
-
+					bool isFinish = false;
 					try
 					{
-						vIsOver = vEnumerator.MoveNext();
+						isFinish = enumerator.MoveNext();
 					}
 					catch (Exception e)
 					{
-						vIsOver = false;
+						isFinish = false;
 						mIsRunning = false;
 
                         mLogger.LogError(string.Format("{0}: {1}", mName, e.Message));
                         mLogger.LogException(e);
                     }
 
-					if ((vEnumerator != null) && (vIsOver == true))
+					if ((enumerator != null) && isFinish)
 					{
-						yield return vEnumerator.Current;
+						yield return enumerator.Current;
 					}
 					else
 					{
@@ -123,7 +121,7 @@
 				}
 			}
 
-			if (vIsTimeup == false)
+			if (!isTimeup)
 			{
 				mOnFinished.InvokeGracefully(mIsStopped);
 			}
@@ -134,10 +132,9 @@
 
 			if (mMgr != null)
 			{
-				int vIndex = mMgr.Container.IndexOf(this);
-
-				if (vIndex >= 0)
-					mMgr.Container.RemoveAt(vIndex);
+				int index = mMgr.Container.IndexOf(this);
+				if (index >= 0)
+					mMgr.Container.RemoveAt(index);
 			}
 		}
 	}
@@ -176,40 +173,32 @@
 		public Coroutine StartCoroutine(out TCoroutine coroutine, object custom, IEnumerator enumerator, Action<bool> onFinished = null, Action onTimeup = null, int timer = 0)
 		{
             coroutine = new TCoroutine(this, custom, enumerator, onFinished, onTimeup, timer);
-
 			if (mContainer != null)
 				mContainer.Add(coroutine);
-
 			return coroutine.Start();
 		}
 
 		public Coroutine StartCoroutine(out TCoroutine coroutine, IEnumerator enumerator, Action<bool> onFinished = null, Action onTimeup = null, int timer = 0)
 		{
             coroutine = new TCoroutine(this, null, enumerator, onFinished, onTimeup, timer);
-
 			if (mContainer != null)
 				mContainer.Add(coroutine);
-
 			return coroutine.Start();
 		}
 
 		public Coroutine StartCoroutine(object custom, IEnumerator enumerator, Action<bool> onFinished = null, Action onTimeup = null, int timer = 0)
 		{
 			TCoroutine coroutine = new TCoroutine(this, custom, enumerator, onFinished, onTimeup, timer);
-
 			if (mContainer != null)
 				mContainer.Add(coroutine);
-
 			return coroutine.Start();
 		}
 
 		public Coroutine StartCoroutine(IEnumerator enumerator, Action<bool> onFinished = null, Action onTimeup = null, int timer = 0)
 		{
 			TCoroutine coroutine = new TCoroutine(this, null, enumerator, onFinished, onTimeup, timer);
-
 			if (mContainer != null)
 				mContainer.Add(coroutine);
-
 			return coroutine.Start();
 		}
 
@@ -217,7 +206,6 @@
 		{
 			if (mContainer != null)
 				mContainer.Add(coroutine);
-
 			return coroutine.Start();
 		}
 
@@ -225,10 +213,8 @@
 		{
 			if (mContainer == null)
 				return;
-
-			int vIndex = mContainer.IndexOf(coroutine);
-
-			if (vIndex >= 0)
+			int index = mContainer.IndexOf(coroutine);
+			if (index >= 0)
 				coroutine.Shutdown();
 		}
 

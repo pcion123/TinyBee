@@ -71,81 +71,80 @@
         }
 
         //載入資源
-        private IEnumerator ILoad(string vPath, string vName, TObject vObj)
+        private IEnumerator ILoad(string path, string name, TObject obj)
         {
-            vObj.Clear();
+			obj.Clear();
 
             //檢查檔案是否存在
 #if !UNITY_ANDROID || UNITY_EDITOR
-            if (File.Exists(vPath + vName) == false)
+			if (File.Exists(path + name) == false)
             {
-                vObj.Err = string.Format("{0}{1} is not exist", vPath, vName);
+				obj.Err = string.Format("{0}{1} is not exist", path, name);
                 yield break;
             }
 #endif
 
 #if UNITY_STANDALONE
-		    string zPath = string.Format("file://{0}{1}", vPath, vName);
+			string fPath = string.Format("file://{0}{1}", path, name);
 #elif UNITY_IOS || UNITY_TVOS
-		    string zPath = string.Format("file://{0}{1}", vPath, vName);
+			string fPath = string.Format("file://{0}{1}", path, name);
 #elif UNITY_ANDROID
-            string zPath = string.Format("{0}{1}", vPath, vName);
+			string fPath = string.Format("{0}{1}", path, name);
 #endif
 
-            Uri vUri = new Uri(zPath);
-            zPath = vUri.AbsoluteUri;
-            WWW vBundle = new WWW(zPath);
-
-            while (!vBundle.isDone)
+			Uri uri = new Uri(fPath);
+			fPath = uri.AbsoluteUri;
+			WWW bundle = new WWW(fPath);
+			while (!bundle.isDone)
             {
-                if (vBundle.error != null)
+				if (bundle.error != null)
                 {
                     break;
                 }
                 else
                 {
-                    yield return vBundle;
+					yield return bundle;
                 }
             }
 
-            if (vBundle.error != null)
+			if (bundle.error != null)
             {
-                vObj.Err = vBundle.error;
-                vBundle.Dispose();
-                vBundle = null;
+				obj.Err = bundle.error;
+				bundle.Dispose();
+				bundle = null;
             }
             else
             {
-                vObj.Bundle = vBundle;
+				obj.Bundle = bundle;
             }
         }
 
-        public IEnumerator ILoadBundle(string vPath, string vName, TObject vObj)
+        public IEnumerator ILoadBundle(string path, string name, TObject obj)
         {
-            IEnumerator vEnumerator = ILoad(vPath, vName + ".unity3d", vObj);
-            while ((vEnumerator != null) && (vEnumerator.MoveNext()))
-                yield return vEnumerator.Current;
+			IEnumerator enumerator = ILoad(path, name + ".unity3d", obj);
+			while ((enumerator != null) && (enumerator.MoveNext()))
+				yield return enumerator.Current;
         }
 
-        public IEnumerator ILoadTexture(string vPath, string vName, TObject vObj)
+		public IEnumerator ILoadTexture(string path, string name, TObject obj)
         {
-            IEnumerator vEnumerator = ILoad(vPath, vName + ".png", vObj);
-            while ((vEnumerator != null) && (vEnumerator.MoveNext()))
-                yield return vEnumerator.Current;
+			IEnumerator enumerator = ILoad(path, name + ".png", obj);
+			while ((enumerator != null) && (enumerator.MoveNext()))
+				yield return enumerator.Current;
         }
 
-        public IEnumerator ILoadData(string vPath, string vName, TObject vObj)
+		public IEnumerator ILoadData(string path, string name, TObject obj)
         {
-            IEnumerator vEnumerator = ILoad(vPath, vName + ".dat", vObj);
-            while ((vEnumerator != null) && (vEnumerator.MoveNext()))
-                yield return vEnumerator.Current;
+			IEnumerator enumerator = ILoad(path, name + ".dat", obj);
+			while ((enumerator != null) && (enumerator.MoveNext()))
+				yield return enumerator.Current;
         }
 
-        public IEnumerator ILoadMP3(string vPath, string vName, TObject vObj)
+		public IEnumerator ILoadMP3(string path, string name, TObject obj)
         {
-            IEnumerator vEnumerator = ILoad(vPath, vName + ".mp3", vObj);
-            while ((vEnumerator != null) && (vEnumerator.MoveNext()))
-                yield return vEnumerator.Current;
+			IEnumerator enumerator = ILoad(path, name + ".mp3", obj);
+			while ((enumerator != null) && (enumerator.MoveNext()))
+				yield return enumerator.Current;
         }
     }
 }

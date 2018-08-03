@@ -9,17 +9,17 @@
 		public string Name; //名稱
 		public Texture Tex; //貼圖
 
-		public rTex (string vName, Texture vTex)
+		public rTex (string name, Texture tex)
 		{
-			Name = vName;
-			Tex = vTex;
+			Name = name;
+			Tex = tex;
 		}
 	}
 
 	public class SVInfo<T> : MonoBehaviour
 	{
-		protected UIForm mUI = null;       //UI介面
-		protected SVList<T> mList = null; //列表物件
+		protected UIForm mUI = null;           //UI介面
+		protected SVList<T> mList = null;      //列表物件
 		private UIDragScrollView mDrag = null; //拖拉物件
 		private long mTimer = 0;               //計時器
 		private bool mIsInfo = false;          //資訊標記
@@ -35,147 +35,132 @@
 		public int Index {get{return mIndex;} set{SetIndex(value);}}
 		public int ID {get{return mID;} set{SetID(value);}}
 
-		protected virtual void Awake ()
+		protected virtual void Awake()
 		{
 			//掛載拖拉腳本
 			mDrag = gameObject.AddComponent<UIDragScrollView>();
 		}
 
 		// Use this for initialization
-		protected virtual void Start ()
+		protected virtual void Start()
 		{
 			//在子類別實作內容
 		}
 
 		// Update is called once per frame
-		protected virtual void Update ()
+		protected virtual void Update()
 		{
 			//在子類別實作內容
 		}
 
 		//重置
-		public virtual void Reset ()
+		public virtual void Reset()
 		{
 			Index = -1;
 		}
 
 		//檢查是否顯示資訊
-		protected virtual bool CheckShowInfo ()
+		protected virtual bool CheckShowInfo()
 		{
 			return false;
 		}
 
 		//設置列表
-		private void SetList (SVList<T> vList)
+		private void SetList(SVList<T> list)
 		{
-			mList = vList;
+			mList = list;
 		}
 
 		//設置計時器
-		private void SetTimer (long vTimer)
+		private void SetTimer(long timer)
 		{
-			mTimer = vTimer;
+			mTimer = timer;
 		}
 
 		//設置是否顯示資訊標記
-		private void SetIsInfo (bool vIsInfo)
+		private void SetIsInfo(bool isInfo)
 		{
-			mIsInfo = vIsInfo;
+			mIsInfo = isInfo;
 		}
 
 		//設置是否按壓標記
-		private void SetIsPress (bool vIsPress)
+		private void SetIsPress(bool isPress)
 		{
-			mIsPress = vIsPress;
+			mIsPress = isPress;
 		}
 
 		//設置索引
-		protected virtual void SetIndex (int vIndex)
+		protected virtual void SetIndex(int index)
 		{
-			mIndex = vIndex;
+			mIndex = index;
 		}
 
 		//設置編號
-		private void SetID (int vID)
+		private void SetID(int id)
 		{
-			mID = vID;
+			mID = id;
 		}
 
 		//載入貼圖
-		protected virtual IEnumerator ILoadTexture (string vPath, string vTexName, Action<Texture> vCallback)
+		protected virtual IEnumerator ILoadTexture(string path, string texname, Action<Texture> callback)
 		{
-			TObject vObject = new TObject();
-
-			Texture vTex = mList.GetTex(vTexName);
-
-			if (vTex != null)
+			Texture tex = mList.GetTex(texname);
+			if (tex != null)
 			{
-				if (vCallback != null)
-					vCallback(vTex);
-
-				vObject.Free();
+				callback.InvokeGracefully(tex);
 				yield break;
 			}
 
-			yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadTexture(vPath, vTexName, vObject));
-
-			if (vObject.Bundle != null)
+			TObject obj = new TObject();
+			yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadTexture(path, texname, obj));
+			if (obj.Bundle != null)
 			{
-				vTex = vObject.Bundle.texture as Texture;
-
-				if (vTex != null)
+				tex = obj.Bundle.texture as Texture;
+				if (tex != null)
 				{
-					mList.TexPool.Add(new rTex(vTexName, vTex));
-
-					vCallback.InvokeGracefully(vTex);
+					mList.TexPool.Add(new rTex(texname, tex));
+					callback.InvokeGracefully(tex);
 				}
 
-				if (vObject.Bundle.assetBundle != null)
-					vObject.Bundle.assetBundle.Unload(false);
+				if (obj.Bundle.assetBundle != null)
+					obj.Bundle.assetBundle.Unload(false);
 			}
 			else
 			{
-				vCallback.InvokeGracefully(null);
+				callback.InvokeGracefully(null);
 			}
-
-			vObject.Free();
+			obj.Free();
 		}
 
 		//載入貼圖
-		protected virtual IEnumerator ILoadTexture (string vPath, string vTexName, int vIndex, Action<int,Texture> vCallback)
+		protected virtual IEnumerator ILoadTexture (string path, string texname, int index, Action<int,Texture> callback)
 		{
-			TObject vObject = new TObject();
-
-			Texture vTex = mList.GetTex(vTexName);
-
-			if (vTex != null)
+			Texture tex = mList.GetTex(texname);
+			if (tex != null)
 			{
-				vCallback.InvokeGracefully(vIndex, vTex);
-				vObject.Free();
+				callback.InvokeGracefully(index, tex);
 				yield break;
 			}
 
-			yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadTexture(vPath, vTexName, vObject));
-
-			if (vObject.Bundle != null)
+			TObject obj = new TObject();
+			yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadTexture(path, texname, obj));
+			if (obj.Bundle != null)
 			{
-				vTex = vObject.Bundle.texture as Texture;
-
-				if (vTex != null)
+				tex = obj.Bundle.texture as Texture;
+				if (tex != null)
 				{
-					mList.TexPool.Add(new rTex(vTexName, vTex));
-					vCallback.InvokeGracefully(vIndex, vTex);
+					mList.TexPool.Add(new rTex(texname, tex));
+					callback.InvokeGracefully(index, tex);
 				}
 
-				if (vObject.Bundle.assetBundle != null)
-					vObject.Bundle.assetBundle.Unload(false);
+				if (obj.Bundle.assetBundle != null)
+					obj.Bundle.assetBundle.Unload(false);
 			}
 			else
 			{
-				vCallback.InvokeGracefully(vIndex, null);
+				callback.InvokeGracefully(index, null);
 			}
-
-			vObject.Free();
+			obj.Free();
 		}
 	}
 }

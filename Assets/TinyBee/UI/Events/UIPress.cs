@@ -6,7 +6,7 @@
     {
         private bool mIsPress = false;
         private bool mIsShow = false;
-        private long mTimer = 0l;
+        private long mTimer = 0L;
 
         public long Interval { get; set; }
         public Action<object> onClick { get; set; }
@@ -53,11 +53,11 @@
             if (mIsPress == false)
                 return false;
 
-            long vTick1 = mTimer + Interval;
-            long vTick2 = DateTime.Now.Ticks;
+            long tick1 = mTimer + Interval;
+            long tick2 = DateTime.Now.Ticks;
 
             //檢查時間間隔
-            if (vTick1 > vTick2)
+			if (tick1 > tick2)
                 return false;
 
             return onCheck.InvokeGracefully();
