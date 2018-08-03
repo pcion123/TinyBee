@@ -9,11 +9,15 @@
 	[TMonoSingletonPath("[Data]/DataMgr")]
 	public class DataMgr : TMgrBehaviour, ISingleton
 	{
+#if UNITY_EDITOR		
         [System.Serializable]
         private class DataDictionary : SerializableDictionary<string, object> { }
-
-        [SerializeField]
-        private DataDictionary mTables = new DataDictionary();
+		[SerializeField]
+		private DataDictionary mTables = new DataDictionary();
+#else
+		[SerializeField]
+		private Dictionary<string,object> mTables = new Dictionary<string,object>();
+#endif
 
 		public static DataMgr Instance
 		{

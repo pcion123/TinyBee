@@ -23,11 +23,15 @@
     [TMonoSingletonPath("[Downloader]/DownloadMgr")]
     public class DownloadMgr : TMgrBehaviour, ISingleton
     {
-        [System.Serializable]
-        private class DownloaderDictionary : SerializableDictionary<string,TDownloader> { }
-
-        [SerializeField]
-        private DownloaderDictionary mTaskMap = null;
+#if UNITY_EDITOR		
+		[System.Serializable]
+		private class DownloaderDictionary : SerializableDictionary<string,TDownloader> { }
+		[SerializeField]
+		private DownloaderDictionary mTaskMap = null;
+#else
+		[SerializeField]
+		private Dictionary<string,TDownloader> mTaskMap = null;
+#endif
 
         public int Count { get { return mTaskMap.Count; } }
 		public string HostName { get; set; }
@@ -48,7 +52,11 @@
 
         public override void Init(params object[] param)
         {
-            mTaskMap = new DownloaderDictionary();
+#if UNITY_EDITOR		
+			mTaskMap = new DownloaderDictionary();
+#else
+			mTaskMap = new Dictionary<string,TDownloader>();
+#endif
         }
 
 		public TDownloader Get(string key)
