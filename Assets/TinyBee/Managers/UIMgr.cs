@@ -122,17 +122,17 @@
         }
 
         //取得UI資訊
-		private TUIInfo GetUIInfo(TUIEnum vUI)
+		private TUIInfo GetUIInfo(TUIEnum ui)
         {
-			return vUI != null ? GetUIInfo(vUI.value) : null;
+			return ui != null ? GetUIInfo(ui.value) : null;
         }
 
         //取得UI資訊
-		private TUIInfo GetUIInfo(int vUI)
+		private TUIInfo GetUIInfo(int ui)
         {
             for (int i = 0; i < mInfoList.Count; i++)
             {
-				if (mInfoList[i].ui != vUI)
+				if (mInfoList[i].ui != ui)
                     continue;
 
                 return mInfoList[i];
@@ -141,11 +141,11 @@
         }
 
         //取得UI名稱
-		private string GetUIName(TUIEnum vUI)
+		private string GetUIName(TUIEnum ui)
         {
             for (int i = 0; i < mInfoList.Count; i++)
             {
-				if (mInfoList[i].ui != vUI.value)
+				if (mInfoList[i].ui != ui.value)
                     continue;
 
                 return mInfoList[i].name;
@@ -154,11 +154,11 @@
         }
 
         //取得UI列舉
-        private TUIEnum GetUIEnum(string vUIName)
+        private TUIEnum GetUIEnum(string uiname)
         {
             for (int i = 0; i < mInfoList.Count; i++)
             {
-                if (mInfoList[i].name != vUIName)
+				if (mInfoList[i].name != uiname)
                     continue;
 
                 return UIEnumBase.GetEnum(mInfoList[i].ui);
@@ -167,17 +167,17 @@
         }
 
         //取得UI
-		public UIForm GetUI(TUIEnum vUI)
+		public UIForm GetUI(TUIEnum ui)
         {
-			return vUI != null ? GetUI(vUI.value) : null;
+			return ui != null ? GetUI(ui.value) : null;
         }
 
         //取得UI
-        public UIForm GetUI(int vUI)
+		public UIForm GetUI(int ui)
         {
             for (int i = 0; i < mForms.Count; i++)
             {
-                if (mForms[i].UI != vUI)
+				if (mForms[i].UI != ui)
                     continue;
 
                 return mForms[i];
@@ -185,17 +185,17 @@
             return null;
         }
 
-        public Transform GetParent(int vParam)
+        public Transform GetParent(int param)
         {
-            return GetParent((eUIParam)vParam);
+			return GetParent((eUIParam)param);
         }
 
-		public Transform GetParent(eUIParam vParam)
+		public Transform GetParent(eUIParam param)
         {
-			if ((vParam & eUIParam.Top) == eUIParam.Top)
+			if ((param & eUIParam.Top) == eUIParam.Top)
 				return GetCamera("Top").transform;
 
-            if ((vParam & eUIParam.Main) == eUIParam.Main)
+			if ((param & eUIParam.Main) == eUIParam.Main)
 				return GetCamera("Main").transform;
 
             return null;
@@ -208,162 +208,162 @@
             return str;
         }
 
-		public void PushUI(UIForm vForm, int vParam)
+		public void PushUI(UIForm form, int param)
         {
-            PushUI(vForm, (eUIParam)vParam);
+			PushUI(form, (eUIParam)param);
         }
 
-        private void PushUI(UIForm vForm, eUIParam vParam)
+		private void PushUI(UIForm form, eUIParam param)
         {
-            mForms.Add(vForm);
+			mForms.Add(form);
 
-            if ((vParam & eUIParam.Standard) == eUIParam.Standard)
-                mStandards.Add(vForm);
+			if ((param & eUIParam.Standard) == eUIParam.Standard)
+				mStandards.Add(form);
 
-            if ((vParam & eUIParam.Main) == eUIParam.Main)
-                mMainStacks.Push(vForm);
+			if ((param & eUIParam.Main) == eUIParam.Main)
+				mMainStacks.Push(form);
 
-            if ((vParam & eUIParam.Top) == eUIParam.Top)
-                mTopStacks.Push(vForm);
+			if ((param & eUIParam.Top) == eUIParam.Top)
+				mTopStacks.Push(form);
 			
 #if _BLUR
-			if ((vParam & eUIParam.Blur) == eUIParam.Blur)
-				mBlurStacks.Push(vForm);
+			if ((param & eUIParam.Blur) == eUIParam.Blur)
+				mBlurStacks.Push(form);
 #endif
 #if _MASK
-			if ((vParam & eUIParam.Mask) == eUIParam.Mask)
-				mMaskStacks.Push(vForm);
+			if ((param & eUIParam.Mask) == eUIParam.Mask)
+				mMaskStacks.Push(form);
 #endif
         }
 
-		public UIForm PopUI(int vUI)
+		public UIForm PopUI(int ui)
         {
-            UIForm vForm = null;
+            UIForm form = null;
             for (int i = 0; i < mForms.Count; i++)
             {
-                if (mForms[i].UI != vUI)
+				if (mForms[i].UI != ui)
                     continue;
 
-                vForm = mForms[i];
+				form = mForms[i];
                 break;
             }
 
-            if (vForm == null)
+			if (form == null)
                 return null;
 
-            mForms.Remove(vForm);
-            mStandards.Remove(vForm);
-            mMainStacks.Remove(vForm);
-            mTopStacks.Remove(vForm);
+			mForms.Remove(form);
+			mStandards.Remove(form);
+			mMainStacks.Remove(form);
+			mTopStacks.Remove(form);
 #if _BLUR
-			mBlurStacks.Remove(vForm);
+			mBlurStacks.Remove(form);
 #endif
 #if _MASK
-			mMaskStacks.Remove(vForm);
+			mMaskStacks.Remove(form);
 #endif
 
-            return vForm;
+			return form;
         }
 
-        public bool PushFont(string vKey, AssetBundle vValue)
+        public bool PushFont(string key, AssetBundle bundle)
         {
-            if (mFontMap.ContainsKey(vKey))
+			if (mFontMap.ContainsKey(key))
                 return false;
 
-            mFontMap.Add(vKey, vValue);
+			mFontMap.Add(key, bundle);
             return true;
         }
 
-		public AssetBundle GetFont(string vKey)
+		public AssetBundle GetFont(string key)
 		{
-			if (!mFontMap.ContainsKey(vKey))
+			if (!mFontMap.ContainsKey(key))
 				return null;
 
 			AssetBundle tmp;
-			if (!mFontMap.TryGetValue(vKey, out tmp))
+			if (!mFontMap.TryGetValue(key, out tmp))
 				return null;
 			
 			return tmp;
 		}
 
-        public AssetBundle PopFont(string vKey)
+		public AssetBundle PopFont(string key)
         {
-            if (!mFontMap.ContainsKey(vKey))
+			if (!mFontMap.ContainsKey(key))
                 return null;
 
             AssetBundle tmp;
-            if (!mFontMap.TryGetValue(vKey, out tmp))
+			if (!mFontMap.TryGetValue(key, out tmp))
                 return null;
 
-            mFontMap.Remove(vKey);
+			mFontMap.Remove(key);
             return tmp;
         }
 
-        public bool PushStandardAtlas(string vKey, AssetBundle vValue)
+		public bool PushStandardAtlas(string key, AssetBundle bundle)
         {
-            if (mStandardAtlasMap.ContainsKey(vKey))
+			if (mStandardAtlasMap.ContainsKey(key))
                 return false;
 
-            mStandardAtlasMap.Add(vKey, vValue);
+			mStandardAtlasMap.Add(key, bundle);
             return true;
         }
 
-		public AssetBundle GetStandardAtlas(string vKey)
+		public AssetBundle GetStandardAtlas(string key)
 		{
-			if (!mStandardAtlasMap.ContainsKey(vKey))
+			if (!mStandardAtlasMap.ContainsKey(key))
 				return null;
 
 			AssetBundle tmp;
-			if (!mStandardAtlasMap.TryGetValue(vKey, out tmp))
+			if (!mStandardAtlasMap.TryGetValue(key, out tmp))
 				return null;
 			
 			return tmp;
 		}
 
-        public AssetBundle PopStandardAtlas(string vKey)
+		public AssetBundle PopStandardAtlas(string key)
         {
-            if (!mStandardAtlasMap.ContainsKey(vKey))
+			if (!mStandardAtlasMap.ContainsKey(key))
                 return null;
 
             AssetBundle tmp;
-            if (!mStandardAtlasMap.TryGetValue(vKey, out tmp))
+			if (!mStandardAtlasMap.TryGetValue(key, out tmp))
                 return null;
 
-            mStandardAtlasMap.Remove(vKey);
+			mStandardAtlasMap.Remove(key);
             return tmp;
         }
 
-        public bool PushAtlas(string vKey, AssetBundle vValue)
+		public bool PushAtlas(string key, AssetBundle bundle)
         {
-            if (mAtlasMap.ContainsKey(vKey))
+			if (mAtlasMap.ContainsKey(key))
                 return false;
 
-            mAtlasMap.Add(vKey, vValue);
+			mAtlasMap.Add(key, bundle);
             return true;
         }
 
-		public AssetBundle GetAtlas(string vKey)
+		public AssetBundle GetAtlas(string key)
 		{
-			if (!mAtlasMap.ContainsKey(vKey))
+			if (!mAtlasMap.ContainsKey(key))
 				return null;
 
 			AssetBundle tmp;
-			if (!mAtlasMap.TryGetValue(vKey, out tmp))
+			if (!mAtlasMap.TryGetValue(key, out tmp))
 				return null;
 			
 			return tmp;
 		}
 
-        public AssetBundle PopAtlas(string vKey)
+		public AssetBundle PopAtlas(string key)
         {
-            if (!mAtlasMap.ContainsKey(vKey))
+			if (!mAtlasMap.ContainsKey(key))
                 return null;
 
             AssetBundle tmp;
-            if (!mAtlasMap.TryGetValue(vKey, out tmp))
+			if (!mAtlasMap.TryGetValue(key, out tmp))
                 return null;
 
-            mAtlasMap.Remove(vKey);
+			mAtlasMap.Remove(key);
             return tmp;
         }
 
@@ -403,12 +403,8 @@
 
 		public void SortUI()
         {
-            int vDepth = 0;
-            for (int i = 0; i < mForms.Count; i++)
-            {
-                vDepth = mForms[i].SortUI(vDepth);
-            }
-
+            int depth = 0;
+			mForms.ForEach(m => depth = m.SortUI(depth));
 #if _BLUR
 			if (mBlurStacks.Top != null && !mBlurStacks.Top.Hidden)
 				mBlurStacks.Top.Blur = true;
@@ -419,70 +415,69 @@
 #endif
         }
 
-		public void OpenUI(int vUI, params object[] param)
+		public void OpenUI(int ui, params object[] param)
         {
-			UIForm vForm = PopUI(vUI);
-            if (vForm != null)
+			UIForm form = PopUI(ui);
+			if (form != null)
             {
-                PushUI(vForm, vForm.Param);
+				PushUI(form, form.Param);
                 SortUI();
                 return;
             }
 
-			TUIInfo vInfo = GetUIInfo(vUI);
-            if (vInfo == null || vInfo.ui == UIEnumBase.None)
+			TUIInfo info = GetUIInfo(ui);
+			if (info == null || info.ui == UIEnumBase.None)
             {
-				mLogger.Log(string.Format("OpenUI Err -> {0}", UIEnumBase.GetEnumName(vUI)));
+				mLogger.Log(string.Format("OpenUI Err -> {0}", UIEnumBase.GetEnumName(ui)));
                 return;
             }
 
-            GameObject vObject = new GameObject(vInfo.name);
-            vForm = (UIForm)vObject.AddComponent(vInfo.type);
-            vForm.Init(this, vInfo.ui, vInfo.name, GetParent(vInfo.param), vInfo.param, vInfo.depth, vInfo.rank);
-            vForm.OpenUI(param);
+			GameObject obj = new GameObject(info.name);
+			form = (UIForm)obj.AddComponent(info.type);
+			form.Init(this, info.ui, info.name, GetParent(info.param), info.param, info.depth, info.rank);
+			form.OpenUI(param);
         }
 
-        public IEnumerator IOpenUI(int vUI, object vValue = null)
+		public IEnumerator IOpenUI(int ui, params object[] param)
         {
-			UIForm vForm = PopUI(vUI);
-            if (vForm != null)
+			UIForm form = PopUI(ui);
+			if (form != null)
             {
-                PushUI(vForm, vForm.Param);
+				PushUI(form, form.Param);
                 SortUI();
                 yield return null;
             }
 
-			TUIInfo vInfo = GetUIInfo(vUI);
-            if (vInfo == null || vInfo.ui == UIEnumBase.None)
+			TUIInfo info = GetUIInfo(ui);
+			if (info == null || info.ui == UIEnumBase.None)
             {
-				mLogger.Log(string.Format("OpenUI Err -> {0}", UIEnumBase.GetEnumName(vUI)));
+				mLogger.Log(string.Format("OpenUI Err -> {0}", UIEnumBase.GetEnumName(ui)));
                 yield return null;
             }
 
-            GameObject vObject = new GameObject(vInfo.name);
-            vForm = (UIForm)vObject.AddComponent(vInfo.type);
-            vForm.Init(this, vInfo.ui, vInfo.name, GetParent(vInfo.param), vInfo.param, vInfo.depth, vInfo.rank);
-            yield return CoroutineMgr.Instance.StartCoroutine(vForm.IOpenUI(vValue));
+			GameObject vObject = new GameObject(info.name);
+			form = (UIForm)vObject.AddComponent(info.type);
+			form.Init(this, info.ui, info.name, GetParent(info.param), info.param, info.depth, info.rank);
+			yield return CoroutineMgr.Instance.StartCoroutine(form.IOpenUI(param));
         }
 
-		public void CloseUI(int vUI, params object[] param)
+		public void CloseUI(int ui, params object[] param)
         {
-			UIForm vForm = PopUI(vUI);
-            if (vForm != null)
+			UIForm form = PopUI(ui);
+			if (form != null)
             {
-                vForm.CloseUI(param);
+				form.CloseUI(param);
                 Resources.UnloadUnusedAssets();
             }
-
 			SortUI();
         }
 
-        public void ResetALL(int vRank, int vUI = 0, params object[] param)
+        public void ResetALL(int rank, int ui = 0, params object[] param)
         {
             List<UIForm> tmp = new List<UIForm>();
             for (int i = 0; i < mForms.Count; i++)
             {
-                if (mForms[i].Rank < vRank)
+				if (mForms[i].Rank < rank)
                     continue;
 
                 tmp.Add(mForms[i]);
@@ -496,83 +491,81 @@
 
 			SortUI();
 
-            UIForm vForm = PopUI(vUI);
-			if (vForm == null)
+			UIForm form = PopUI(ui);
+			if (form == null)
             {
-				if (vUI != UIEnumBase.None)
-                	OpenUI(vUI, param);
+				if (ui != UIEnumBase.None)
+					OpenUI(ui, param);
             }
             else
             {
-                PushUI(vForm, vForm.Param);
+				PushUI(form, form.Param);
                 SortUI();
             }
         }
 
-		public void ShowUI(int vUI)
+		public void ShowUI(int ui)
         {
-			UIForm vForm = GetUI(vUI);
+			UIForm form = GetUI(ui);
 
-            if (vForm == null)
+			if (form == null)
                 return;
 
-            vForm.Hidden = false;
+			form.Hidden = false;
         }
 
-		public void HideUI(int vUI)
+		public void HideUI(int ui)
         {
-			UIForm vForm = GetUI(vUI);
+			UIForm form = GetUI(ui);
 
-            if (vForm == null)
+			if (form == null)
                 return;
 
-            vForm.Hidden = true;
+			form.Hidden = true;
         }
 
-		public void ShowLoading(GameObject vObj, bool vIsShow = true)
+		public void ShowLoading(GameObject obj, bool isShow = true)
         {
-			UIForm vForm = GetUI(UIEnumBase.Loading);
-			if (vForm != null)
-				vForm.Open();
-
-            vObj.transform.localPosition = new Vector3(0, 10000, 0);
+			UIForm form = GetUI(UIEnumBase.Loading);
+			if (form != null)
+				form.Open();
+			obj.transform.localPosition = new Vector3(0, 10000, 0);
         }
 
-        public void HideLoading(GameObject vObj)
+		public void HideLoading(GameObject obj)
         {
-			UIForm vForm = GetUI(UIEnumBase.Loading);
-			if (vForm != null)
-				vForm.Close();
-
-            vObj.transform.localPosition = new Vector3(0, 0, 0);
+			UIForm form = GetUI(UIEnumBase.Loading);
+			if (form != null)
+				form.Close();
+			obj.transform.localPosition = Vector3.zero;
         }
 
-        public void ShowNet(string vMsg, bool vShowPanel = true, bool vShowBtn = false)
+        public void ShowNet(string msg, bool showPanel = true, bool showButton = false)
         {
-            UIForm vForm = GetUI(UIEnumBase.Connecting);
-            if (vForm != null)
-                vForm.Open();
+			UIForm form = GetUI(UIEnumBase.Connecting);
+			if (form != null)
+				form.Open();
         }
 
         public void HideNet()
         {
-            UIForm vForm = GetUI(UIEnumBase.Connecting);
-            if (vForm != null)
-                vForm.Close();
+			UIForm form = GetUI(UIEnumBase.Connecting);
+			if (form != null)
+				form.Close();
         }
 
         public void ShowTutorial()
         {
-            UIForm vForm = GetUI(UIEnumBase.Tutorial);
-            if (vForm != null)
-                vForm.Open();
+			UIForm form = GetUI(UIEnumBase.Tutorial);
+			if (form != null)
+				form.Open();
         }
 
         public void HideTutorial()
         {
-            UIForm vForm = GetUI(UIEnumBase.Tutorial);
-            if (vForm != null)
-                vForm.Close();
+			UIForm form = GetUI(UIEnumBase.Tutorial);
+			if (form != null)
+				form.Close();
         }
     }
 }

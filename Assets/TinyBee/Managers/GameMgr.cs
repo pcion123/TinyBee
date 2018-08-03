@@ -71,21 +71,21 @@
         }
 
         //取得語系路徑
-        private string GetLangPath(string vPath, bool vIsSlash = false)
+        private string GetLangPath(string path, bool isSlash = false)
         {
             string[] values = Enum.GetNames(typeof(eLanguage));
             foreach (string value in values)
             {
-                if (vPath.Contains(value + "/") == true)
-                    return vIsSlash ? value + "/" : value;
+				if (path.Contains(value + "/") == true)
+					return isSlash ? value + "/" : value;
             }
             return string.Empty;
         }
 
         //取得語系路徑
-        private string GetLangPath(eLanguage vLang, bool vIsSlash = false)
+		private string GetLangPath(eLanguage lang, bool isSlash = false)
         {
-            return vIsSlash ? vLang.ToString() + "/" : vLang.ToString();
+			return isSlash ? lang.ToString() + "/" : lang.ToString();
         }
 
         //取得存取路徑

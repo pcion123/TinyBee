@@ -131,7 +131,7 @@
             return false;
         }
 
-		public virtual int SortUI(int vDepth)
+		public virtual int SortUI(int depth)
         {
 #if _BLUR
 			Blur = false;
@@ -140,8 +140,8 @@
 			Mask = false;
 #endif
 
-            mMinDepth = vDepth + 1;
-            mMaxDepth = vDepth + 1;
+			mMinDepth = depth + 1;
+			mMaxDepth = depth + 1;
 
 			SetParent(mParent, false);
             SetDepth(gameObject);
@@ -150,69 +150,66 @@
         }
 
         //設置圖層深度
-		public virtual void SetDepth(GameObject vObj)
+		public virtual void SetDepth(GameObject obj)
         {
 			Mask = true;
-            UIPanel[] vPanels = vObj.GetComponentsInChildren<UIPanel>();
-            if (vPanels != null)
-                vPanels.ForEach(vPanel => vPanel.depth = mOffsetDepth + mMaxDepth++);
+			UIPanel[] panels = obj.GetComponentsInChildren<UIPanel>();
+			if (panels != null)
+				panels.ForEach(p => p.depth = mOffsetDepth + mMaxDepth++);
 			Mask = false;
         }
 
         //設置事件遮罩
-        public virtual void SetEventMask(GameObject vObj)
+		public virtual void SetEventMask(GameObject obj)
         {
-            if (vObj == null)
+			if (obj == null)
                 return;
-
-            //取得Collider
-            BoxCollider vCollider = vObj.GetComponent<BoxCollider>();
-
-            if (vCollider == null)
-                vCollider = vObj.AddComponent<BoxCollider>();
-
-            vCollider.size = new Vector3(mMgr.RealWidth, mMgr.RealHeight, 0);
+			
+			BoxCollider collider = obj.GetComponent<BoxCollider>();
+			if (collider == null)
+				collider = obj.AddComponent<BoxCollider>();
+			collider.size = new Vector3(mMgr.RealWidth, mMgr.RealHeight, 0);
         }
 
-        public void SetParent(Transform vParent, bool vIsIdentity = true)
+        public void SetParent(Transform parent, bool isIdentity = true)
         {
-			mParent = vParent;
+			mParent = parent;
 
-            if (vIsIdentity)
+			if (isIdentity)
             {
                 transform
-                    .Parent(vParent != null ? vParent : null)
+					.Parent(parent != null ? parent : null)
                     .LocalIdentity();
             }
             else
             {
-                Vector3 vPos = transform.localPosition;
-                Vector3 vRot = transform.localEulerAngles;
-                Vector3 vSca = transform.localScale;
+                Vector3 pos = transform.localPosition;
+                Vector3 rot = transform.localEulerAngles;
+                Vector3 sca = transform.localScale;
 
-                transform.parent = vParent != null ? vParent : null;
-                transform.localPosition = vPos;
-                transform.localEulerAngles = vRot;
-                transform.localScale = vSca;
+				transform.parent = parent != null ? parent : null;
+				transform.localPosition = pos;
+				transform.localEulerAngles = rot;
+				transform.localScale = sca;
             }
         }
 
         //初始化
-        public void Init(UIMgr vMgr, int vUI, string vUIName, Transform vParent, int vParam, int vDepth, int vRank)
+        public void Init(UIMgr mgr, int ui, string uiname, Transform parent, int vParam, int depth, int rank)
         {
-            mMgr = vMgr;
-            mUI = vUI;
-            mUIName = vUIName;
-            mMinDepth = vDepth;
-            mMaxDepth = vDepth;
-            mOffsetDepth = vDepth;
+			mMgr = mgr;
+			mUI = ui;
+			mUIName = uiname;
+			mMinDepth = depth;
+			mMaxDepth = depth;
+			mOffsetDepth = depth;
             mParam = vParam;
-            mRank = vRank;
+			mRank = rank;
 #if _MASK
 			mMask = null;
 #endif
 
-            SetParent(vParent);
+			SetParent(parent);
         }
 
         public virtual void Open()
@@ -287,119 +284,113 @@
 		//建立遮罩
 		protected IEnumerator IBuildMask()
 		{
-			TObject vObj = new TObject();
-			string vPath = Application.streamingAssetsPath + "/" + GameMgr.Instance.LanguagePath + "/Main/Common/UIs/Panels/";
-			AssetBundle vBundle = mMgr.GetStandardAtlas("Panel_Mask-Atlas");
-			if (vBundle == null)
+			TObject obj = new TObject();
+			string path = Application.streamingAssetsPath + "/" + GameMgr.Instance.LanguagePath + "/Main/Common/UIs/Panels/";
+			AssetBundle bundle = mMgr.GetStandardAtlas("Panel_Mask-Atlas");
+			if (bundle == null)
 			{
-				yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadBundle(vPath, "Panel_Mask-Atlas", vObj));
-				if (vObj.Err != null)
+				yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadBundle(path, "Panel_Mask-Atlas", obj));
+				if (obj.Err != null)
 				{
-					mLogger.Log(vObj.Err);
+					mLogger.Log(obj.Err);
 				}
 				else
 				{
-					GameObject vMask = vObj.Bundle.assetBundle.mainAsset as GameObject;
+					GameObject vMask = obj.Bundle.assetBundle.mainAsset as GameObject;
 					UIAtlas vAtlas = vMask.GetComponent<UIAtlas>();
-					mMgr.PushStandardAtlas("Panel_Mask-Atlas", vObj.Bundle.assetBundle);
+					mMgr.PushStandardAtlas("Panel_Mask-Atlas", obj.Bundle.assetBundle);
 				}
 			}
 
-			yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadBundle(vPath, "Panel_Mask", vObj));
-
-			if (vObj.Err != null)
+			yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadBundle(path, "Panel_Mask", obj));
+			if (obj.Err != null)
 			{
-				mLogger.Log(vObj.Err);
+				mLogger.Log(obj.Err);
 			}
 			else
 			{
-				mMask = GameObject.Instantiate(vObj.Bundle.assetBundle.mainAsset) as GameObject;
+				mMask = GameObject.Instantiate(obj.Bundle.assetBundle.mainAsset) as GameObject;
 				mMask.name = "Panel_Mask";
 
 				//掛載
 				if (mMask != null)
 					AddToBone(mMask);
 
-				vObj.Bundle.assetBundle.Unload(false);
+				obj.Bundle.assetBundle.Unload(false);
 			}
-			vObj.Free();
+			obj.Free();
 		}
 #endif
 
         //搜尋子物件
-		protected GameObject FindChild(string vPath)
+		protected GameObject FindChild(string path)
         {
-            if (vPath == null)
+			if (path == null)
                 return null;
 
-            if (vPath == "")
+			if (path == "")
                 return gameObject;
 
-            Transform vTarget = transform.Find(vPath);
+			Transform target = transform.Find(path);
 
-            return vTarget == null ? null : vTarget.gameObject;
+			return target == null ? null : target.gameObject;
         }
 
         //掛載節點
-		protected bool AddToBone(GameObject vObject, string vPath = null)
+		protected bool AddToBone(GameObject obj, string path = null)
         {
-            if (vObject == null)
+			if (obj == null)
                 return false;
 
-            Vector3 vPos = vObject.transform.localPosition;
-            Vector3 vRot = vObject.transform.localEulerAngles;
-            Vector3 vSca = vObject.transform.localScale;
+			Vector3 pos = obj.transform.localPosition;
+			Vector3 rot = obj.transform.localEulerAngles;
+			Vector3 sca = obj.transform.localScale;
 
-            if (vPath == null)
+			if (path == null)
             {
-                vObject.transform.parent = transform;
+				obj.transform.parent = transform;
             }
             else
             {
-                GameObject vTarget = FindChild(vPath);
-
-                if (vTarget == null)
+				GameObject target = FindChild(path);
+				if (target == null)
                     return false;
-
-                vObject.transform.parent = vTarget.transform;
+				obj.transform.parent = target.transform;
             }
 
-            vObject.transform.localPosition = vPos;
-            vObject.transform.localEulerAngles = vRot;
-            vObject.transform.localScale = vSca;
-
+			obj.transform.localPosition = pos;
+			obj.transform.localEulerAngles = rot;
+			obj.transform.localScale = sca;
             return true;
         }
 
         //掛載節點
-		protected bool AddToBone(GameObject vObject, Transform vParent)
+		protected bool AddToBone(GameObject obj, Transform parent)
         {
-            if ((vObject == null) || (vParent == null))
+			if ((obj == null) || (parent == null))
                 return false;
 
-            Vector3 vPos = vObject.transform.localPosition;
-            Vector3 vRot = vObject.transform.localEulerAngles;
-            Vector3 vSca = vObject.transform.localScale;
+			Vector3 pos = obj.transform.localPosition;
+			Vector3 rot = obj.transform.localEulerAngles;
+			Vector3 sca = obj.transform.localScale;
 
-            vObject.transform.parent = vParent;
-            vObject.transform.localPosition = vPos;
-            vObject.transform.localEulerAngles = vRot;
-            vObject.transform.localScale = vSca;
-
+			obj.transform.parent = parent;
+			obj.transform.localPosition = pos;
+			obj.transform.localEulerAngles = rot;
+			obj.transform.localScale = sca;
             return true;
         }
 
         //移除節點
-		protected bool DelToBone(GameObject vObject)
+		protected bool DelToBone(GameObject obj)
         {
-            if (vObject == null)
+			if (obj == null)
                 return false;
 
-            vObject.transform.parent = null;
-            vObject.transform.localPosition = Vector3.zero;
-            vObject.transform.localEulerAngles = Vector3.zero;
-            vObject.transform.localScale = Vector3.one;
-
+			obj.transform.parent = null;
+			obj.transform.localPosition = Vector3.zero;
+			obj.transform.localEulerAngles = Vector3.zero;
+			obj.transform.localScale = Vector3.one;
             return true;
         }
     }

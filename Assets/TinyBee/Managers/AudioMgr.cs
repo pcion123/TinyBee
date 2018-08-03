@@ -27,20 +27,19 @@
 		public bool loop { get { return mAudio.loop; } set { SetLoop(value); } }
 		public bool isPlaying { get { return mAudio.isPlaying; } }
 		public AudioClip clip { get { return mAudio.clip; } set { SetClip(value); } }
-		public string Path { get { return mPath; } set { SetPath(value); } }
-		public string Name { get { return mName; } set { SetName(value); } }
+		public string Path { get; set; }
+		public string Name { get; set; }
 
-		public TAudio(AudioMgr vMgr, eAudio vKind, GameObject vObject)
+		public TAudio(AudioMgr mgr, eAudio kind, GameObject obj)
 		{
-			mMgr = vMgr;
-			mKind = vKind;
+			mMgr = mgr;
+			mKind = kind;
 
-			if (vObject != null)
+			if (obj != null)
 			{
-				mAudio = vObject.GetComponent<AudioSource>();
-
+				mAudio = obj.GetComponent<AudioSource>();
 				if (mAudio == null)
-					mAudio = vObject.AddComponent<AudioSource>();
+					mAudio = obj.AddComponent<AudioSource>();
 			}
 		}
 
@@ -55,29 +54,19 @@
 			mKind = eAudio.NONE;
 		}
 
-		private void SetClip(AudioClip vClip)
+		private void SetClip(AudioClip clip)
 		{
-			mAudio.clip = vClip;
+			mAudio.clip = clip;
 		}
 
-		private void SetPlayOnAwake(bool vPlayOnAwake)
+		private void SetPlayOnAwake(bool playOnAwake)
 		{
-			mAudio.playOnAwake = vPlayOnAwake;
+			mAudio.playOnAwake = playOnAwake;
 		}
 
-		private void SetLoop(bool vloop)
+		private void SetLoop(bool loop)
 		{
-			mAudio.loop = vloop;
-		}
-
-		private void SetPath(string vPath)
-		{
-			mPath = vPath;
-		}
-
-		private void SetName(string vName)
-		{
-			mName = vName;
+			mAudio.loop = loop;
 		}
 
 		public void Play()
@@ -85,11 +74,11 @@
 			switch (mKind)
 			{
 				case eAudio.MUSIC:
-					if (mMgr.IsMusic == false)
+					if (!mMgr.IsMusic)
 						return;
 					break;
 				case eAudio.SOUND:
-					if (mMgr.IsSound == false)
+					if (!mMgr.IsSound)
 						return;
 					break;
 				default:
@@ -130,64 +119,58 @@
 
 		protected override void OnBeforeDestroy()
 		{
-			if (mContainer != null)
-			{
-                mContainer.Clear();
-                mContainer = null;
-			}
+			mContainer.Free();
 
 			base.OnBeforeDestroy();
 		}
 
-		private void SetIsMusic(bool vIsMusic)
+		private void SetIsMusic(bool isMusic)
 		{
-			mIsMusic = vIsMusic;
+			mIsMusic = isMusic;
 
 			for (int i = 0; i < mContainer.Count; i++)
 			{
 				if (mContainer[i].Kind != eAudio.MUSIC)
 					continue;
 
-				if (vIsMusic == true)
+				if (isMusic)
                     mContainer[i].Play();
 				else
                     mContainer[i].Stop();
 			}
 		}
 
-		private void SetIsSound(bool vIsSound)
+		private void SetIsSound(bool isSound)
 		{
-			mIsSound = vIsSound;
+			mIsSound = isSound;
 
 			for (int i = 0; i < mContainer.Count; i++)
 			{
 				if (mContainer[i].Kind != eAudio.SOUND)
 					continue;
 
-				if (vIsSound == true)
+				if (isSound)
                     mContainer[i].Play();
 				else
                     mContainer[i].Stop();
 			}
 		}
 
-		public TAudio Add(GameObject vObject, eAudio vKind)
+		public TAudio Add(GameObject obj, eAudio kind)
 		{
-			if (vObject == null)
+			if (obj == null)
 				return null;
 
-			TAudio vAudio = new TAudio(this, vKind, vObject);
-
+			TAudio audio = new TAudio(this, kind, obj);
 			if (mContainer != null)
-                mContainer.Add(vAudio);
-
-			return vAudio;
+				mContainer.Add(audio);
+			return audio;
 		}
 
-		public void Del(TAudio vAudio)
+		public void Del(TAudio audio)
 		{
 			if (mContainer != null)
-                mContainer.Remove(vAudio);
+				mContainer.Remove(audio);
 		}
 	}
 }

@@ -82,28 +82,28 @@
                     string sName = data.FileName;
                     TFile.Save(sPath, sName, bundle.bytes);
 
-					using (FileStream vFileStream = new FileStream(sPath + sName, FileMode.Open, FileAccess.Read))
+					using (FileStream fileStream = new FileStream(sPath + sName, FileMode.Open, FileAccess.Read))
                     {
-                        using (ZipInputStream vZipInputStream = new ZipInputStream(vFileStream))
+						using (ZipInputStream zipInputStream = new ZipInputStream(fileStream))
                         {
-                            ZipEntry vZipEntry;
+                            ZipEntry zipEntry;
 
                             // 逐一取出壓縮檔內的檔案(解壓縮)
-                            while ((vZipEntry = vZipInputStream.GetNextEntry()) != null)
+							while ((zipEntry = zipInputStream.GetNextEntry()) != null)
                             {
-                                string zPath = GameMgr.Instance.DataPath + data.Path + vZipEntry.Name;
+								string zPath = GameMgr.Instance.DataPath + data.Path + zipEntry.Name;
 
                                 //檢查是否存在舊檔案
                                 if (File.Exists(zPath) == true)
                                     File.Delete(zPath);
 
-                                mLogger.Log(vZipEntry.Name);
+								mLogger.Log(zipEntry.Name);
 
                                 using (FileStream fs = File.Create(zPath))
                                 {
                                     while (true)
                                     {
-                                        int size = vZipInputStream.Read(mBuffer, 0, mBuffer.Length);
+										int size = zipInputStream.Read(mBuffer, 0, mBuffer.Length);
 
                                         if (size > 0)
                                             fs.Write(mBuffer, 0, size);
@@ -116,9 +116,9 @@
                                 }
                                 yield return null;
                             }
-                            vZipInputStream.Close();
+							zipInputStream.Close();
                         }
-                        vFileStream.Close();
+						fileStream.Close();
                     }
 
 #if !UNITY_TVOS || UNITY_EDITOR

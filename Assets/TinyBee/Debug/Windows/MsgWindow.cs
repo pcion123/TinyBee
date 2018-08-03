@@ -75,31 +75,27 @@
             GUILayout.BeginHorizontal();
             try
             {
-                string vMsg = string.Empty;
-                TLog vLog = GetCurrentLog();
-                if (vLog != null)
+                string msg = string.Empty;
+                TLog log = GetCurrentLog();
+				if (log != null)
                 {
-                    if (vLog.Count <= vLog.MaxShowLine)
+					if (log.Count <= log.MaxShowLine)
                     {
-                        for (int i = 0; i < vLog.Count; i++)
+						for (int i = 0; i < log.Count; i++)
                         {
-                            if (i == 0) vMsg = vLog.Messages[i];
-                            else vMsg = vMsg + "\n" + vLog.Messages[i];
+							msg = i == 0 ? log.Messages[i] : msg + "\n" + log.Messages[i];
                         }
                     }
                     else
                     {
-                        for (int i = vLog.MessageLine - vLog.MaxShowLine; i < vLog.Count; i++)
+						for (int i = log.MessageLine - log.MaxShowLine; i < log.Count; i++)
                         {
-                            if (i == vLog.MessageLine - vLog.MaxShowLine)
-                                vMsg = vLog.Messages[i];
-                            else
-                                vMsg = vMsg + "\n" + vLog.Messages[i];
+							msg = i == (log.MessageLine - log.MaxShowLine) ? log.Messages[i] : msg + "\n" + log.Messages[i];
                         }
                     }
                 }
 
-                GUI.Label(new Rect(5, 15, 400, 450), vMsg);
+				GUI.Label(new Rect(5, 15, 400, 450), msg);
             }
             catch (System.Exception e)
             {

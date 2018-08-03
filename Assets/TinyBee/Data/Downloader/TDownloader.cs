@@ -36,8 +36,8 @@
 		private Dictionary<string,string> mRecordMap = null;
 		private List<rRes> mDownloadList = null;
 		private int mDownloadCount = 0;
-		private long mTotalSize = 0l;
-		private long mNowSize = 0l;
+		private long mTotalSize = 0L;
+		private long mNowSize = 0L;
 		private eStatus mPreStatus = eStatus.None;
         protected eStatus mStatus = eStatus.None;
         protected byte[] mBuffer = new byte[1024 * 1024];
@@ -198,16 +198,16 @@
 
 			if (mStatus != eStatus.Error)
 			{
-				mNowSize = 0l;
+				mNowSize = 0L;
 				for (int i = 0; i < mDownloadList.Count; i++)
 				{
 					mStatus = eStatus.Downloading;
-					IEnumerator vEnumerator = GetDownloader(mDownloadList[i]);
-					while (vEnumerator != null)
+					IEnumerator enumerator = GetDownloader(mDownloadList[i]);
+					while (enumerator != null)
 					{
 						try
 						{
-							if (!vEnumerator.MoveNext())
+							if (!enumerator.MoveNext())
 								break;
 						}
 						catch (Exception e)
@@ -217,7 +217,7 @@
 							mLogger.LogException(e);
 							break;
 						}
-						yield return vEnumerator.Current;
+						yield return enumerator.Current;
 					}
 					if (mStatus != eStatus.Error)
 					{
@@ -395,60 +395,5 @@
 
         protected abstract IEnumerator IDownloadBundle(string ip, string hostName, rRes data);
         protected abstract IEnumerator IDownloadZip(string ip, string hostName, rRes data);
-
-        protected IEnumerator IUnzip(string vDataPath, string vLangPath)
-        {
-            yield return null;
-
-            string[] vFiles = Directory.GetFiles(vDataPath + vLangPath, "*.zip", SearchOption.AllDirectories);
-
-            for (int i = 0; i < vFiles.Length; i++)
-            {
-                string path = vFiles[i].Replace("\\", "/");
-                string filename = Path.GetFileName(path);
-                int index = path.IndexOf(vLangPath);
-                string subStr = path.Substring(index, path.Length - index);
-                string dataPath = subStr.Replace(filename, "");
-
-                using (FileStream vFileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
-                {
-                    using (ZipInputStream vZipInputStream = new ZipInputStream(vFileStream))
-                    {
-                        ZipEntry vZipEntry;
-
-                        // 逐一取出壓縮檔內的檔案(解壓縮)
-                        while ((vZipEntry = vZipInputStream.GetNextEntry()) != null)
-                        {
-                            string zPath = vDataPath + dataPath + vZipEntry.Name;
-
-                            //檢查是否存在舊檔案
-                            if (File.Exists(zPath) == true)
-                                File.Delete(zPath);
-
-                            mLogger.Log(vZipEntry.Name);
-
-                            using (FileStream fs = File.Create(zPath))
-                            {
-                                while (true)
-                                {
-                                    int size = vZipInputStream.Read(mBuffer, 0, mBuffer.Length);
-
-                                    if (size > 0)
-                                        fs.Write(mBuffer, 0, size);
-                                    else
-                                        break;
-
-                                    yield return null;
-                                }
-                                fs.Close();
-                            }
-                            yield return null;
-                        }
-                        vZipInputStream.Close();
-                    }
-                    vFileStream.Close();
-                }
-            }
-        }
     }
 }

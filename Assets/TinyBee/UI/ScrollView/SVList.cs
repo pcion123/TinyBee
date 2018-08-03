@@ -6,12 +6,12 @@
 
 	public class SVList<T> : MonoBehaviour
 	{
-		protected UIForm mUI = null;                 //UI介面
+		protected UIForm mUI = null;                     //UI介面
 		protected UIScrollView mScrollView = null;       //ScrollView
-		protected WrapContent mWrapContent = null;    //WrapContent
+		protected WrapContent mWrapContent = null;       //WrapContent
 		protected UIPanel mPanel = null;                 //Panel
-		protected List<T> mInfo = null;             //資訊列表
-		protected List<SVInfo<T>> mContainer = null;//資訊容器
+		protected List<T> mInfo = null;                  //資訊列表
+		protected List<SVInfo<T>> mContainer = null;     //資訊容器
 		private List<rTex> mTexPool = null;              //貼圖暫存池
 		private GameObject mItem = null;                 //元件
 		private Vector4 mBounds = Vector4.zero;          //顯示範圍
@@ -48,7 +48,7 @@
 		public bool IsDrag {get{return mIsDrag;} set{SetIsDrag(value);}}
 		public bool IsRepeat {get{return mIsRepeat;} set{SetIsRepeat(value);}}
 
-		protected virtual void Awake ()
+		protected virtual void Awake()
 		{
 			//建立ScrollView
 			if (mScrollView == null)
@@ -64,12 +64,12 @@
 			//建立WrapContent
 			if (mWrapContent == null)
 			{
-				GameObject vContainer = new GameObject("Container");
-				vContainer.transform.parent = transform;
-				vContainer.transform.localPosition = Vector3.zero;
-				vContainer.transform.localEulerAngles = Vector3.zero;
-				vContainer.transform.localScale = Vector3.one;
-				mWrapContent = vContainer.AddComponent<WrapContent>();
+				GameObject container = new GameObject("Container");
+				container.transform.parent = transform;
+				container.transform.localPosition = Vector3.zero;
+				container.transform.localEulerAngles = Vector3.zero;
+				container.transform.localScale = Vector3.one;
+				mWrapContent = container.AddComponent<WrapContent>();
 				mWrapContent.onInitializeItem = OnUpdateItem;
 				mWrapContent.isRepeat = false;
 				mWrapContent.OnMoving = OnMoving;
@@ -96,52 +96,39 @@
 		}
 
 		// Use this for initialization
-		protected virtual void Start ()
+		protected virtual void Start()
 		{
 			//在子類別實作內容
 		}
 
 		// Update is called once per frame
-		protected virtual void Update ()
+		protected virtual void Update()
 		{
 			//在子類別實作內容
 		}
 
 		//事件 更新元件
-		protected virtual void OnUpdateItem (GameObject go, int wrapIndex, int realIndex)
-		{
-			//Debug.Log(string.Format("{0} P({1}) wrapindex({2}) -> readindex({3})", go.name, go.transform.localPosition, wrapIndex, realIndex));
-		}
+		protected virtual void OnUpdateItem(GameObject go, int wrapIndex, int realIndex) {}
 
 		//ScrollView事件 拖動開始
-		protected virtual void OnDragStarted ()
-		{
-		}
+		protected virtual void OnDragStarted() {}
 
 		//ScrollView事件 拖動結束
-		protected virtual void OnDragFinished ()
-		{
-		}
+		protected virtual void OnDragFinished() {}
 
 		//ScrollView事件 移動
-		protected virtual void OnMomentumMove ()
-		{
-		}
+		protected virtual void OnMomentumMove() {}
 
 		//ScrollView事件 移動停止
-		protected virtual void OnStoppedMoving ()
-		{
-		}
+		protected virtual void OnStoppedMoving() {}
 
 		//WrapContent事件 移動
-		protected virtual void OnMoving ()
-		{
-		}
+		protected virtual void OnMoving() {}
 
 		//重設
-		public virtual void Reset (bool vIsBottom = false)
+		public virtual void Reset(bool isBottom = false)
 		{
-			UIDragScrollView[] vDrag = gameObject.GetComponentsInChildren<UIDragScrollView>();
+			UIDragScrollView[] drag = gameObject.GetComponentsInChildren<UIDragScrollView>();
 
 			//檢查是否可以拖動
 			IsDrag = CheckCanDrag();
@@ -152,20 +139,20 @@
 			//重置List位置
 			mScrollView.ResetPosition();
 
-			float vX = transform.localPosition.x;
-			float vY = transform.localPosition.y;
-			float vZ = transform.localPosition.z;
+			float x = transform.localPosition.x;
+			float y = transform.localPosition.y;
+			float z = transform.localPosition.z;
 
 			//檢查方向
 			if (mDirection == eDirection.Horizontal)
 			{
-				transform.localPosition = new Vector3(mOriginalX + mFixX, vY, 0);
+				transform.localPosition = new Vector3(mOriginalX + mFixX, y, 0);
 				mPanel.baseClipRegion = mBounds;
 				mPanel.clipOffset = new Vector2(-mFixX, 0);
 			}
 			else
 			{
-				transform.localPosition = new Vector3(vX, mOriginalY + mFixY, 0);
+				transform.localPosition = new Vector3(x, mOriginalY + mFixY, 0);
 				mPanel.baseClipRegion = mBounds;
 				mPanel.clipOffset = new Vector2(0, -mFixY);
 			}
@@ -174,12 +161,12 @@
 			if ((mContainer.Count * mUnitCount) <= (mItemCount * mUnitCount))
 				mWrapContent.SortAlphabetically();
 
-			if ((vIsBottom == true) && (Info.Count > mItemCount))
+			if ((isBottom == true) && (Info.Count > mItemCount))
 				MoveToItem(Info.Count - 1, 4, false);
 		}
 
 		//檢查數量是否可以拖動
-		public virtual bool CheckCanDrag ()
+		public virtual bool CheckCanDrag()
 		{
 			if ((mContainer.Count * mUnitCount) <= (mItemCount * mUnitCount))
 			{
@@ -192,7 +179,7 @@
 		}
 
 		//檢查是否需要增加元件
-		public virtual bool CheckNeedAddItem ()
+		public virtual bool CheckNeedAddItem()
 		{
 			if (mContainer.Count > mItemCount + 2)
 				return false;
@@ -201,69 +188,67 @@
 		}
 
 		//檢查是否需要加入貼圖
-		private bool CheckNeedAddTex (string vName)
+		private bool CheckNeedAddTex(string name)
 		{
 			for (int i = 0; i < mTexPool.Count; i++)
 			{
-				if (mTexPool[i].Name != vName)
+				if (mTexPool[i].Name != name)
 					continue;
 
 				return false;
 			}
-
 			return true;
 		}
 
 		//取得貼圖
-		public Texture GetTex (string vName)
+		public Texture GetTex(string name)
 		{
 			for (int i = 0; i < mTexPool.Count; i++)
 			{
-				if (mTexPool[i].Name != vName)
+				if (mTexPool[i].Name != name)
 					continue;
 
 				return mTexPool[i].Tex;
 			}
-
 			return null;
 		}
 
 		//取得資訊
-		public T GetInfo (int vIndex)
+		public T GetInfo(int index)
 		{
 			//檢查物件
 			if (mInfo == null)
 				return default(T);
 
 			//檢查索引
-			if (vIndex < 0)
+			if (index < 0)
 				return default(T);
 
 			//檢查索引
-			if (vIndex > mInfo.Count - 1)
+			if (index > mInfo.Count - 1)
 				return default(T);
 
-			return mInfo[vIndex];
+			return mInfo[index];
 		}
 
 		//設置元件
-		private void SetItem (GameObject vItem)
+		private void SetItem(GameObject item)
 		{
-			mItem = vItem;
+			mItem = item;
 		}
 
 		//設置顯示範圍
-		private void SetBounds (Vector4 vBounds)
+		private void SetBounds(Vector4 bounds)
 		{
-			mBounds = vBounds;
+			mBounds = bounds;
 		}
 
 		//設置方向
-		private void SetDirection (eDirection vDirection)
+		private void SetDirection(eDirection direction)
 		{
-			mDirection = vDirection;
+			mDirection = direction;
 
-			if (vDirection == eDirection.Horizontal)
+			if (direction == eDirection.Horizontal)
 			{
 				if (mScrollView != null)
 					mScrollView.movement = UIScrollView.Movement.Horizontal;
@@ -276,81 +261,79 @@
 		}
 
 		//設置單元數量
-		private void SetUnitCount (int vUnitCount)
+		private void SetUnitCount(int unitCount)
 		{
-			mUnitCount = vUnitCount;
+			mUnitCount = unitCount;
 		}
 
 		//設置元件數量
-		private void SetItemCount (int vItemCount)
+		private void SetItemCount(int itemCount)
 		{
-			mItemCount = vItemCount;
+			mItemCount = itemCount;
 		}
 
 		//設置元件高度
-		private void SetItemHeight (float vItemHeight)
+		private void SetItemHeight(float itemHeight)
 		{
-			mItemHeight = vItemHeight;
+			mItemHeight = itemHeight;
 
 			if (mDirection == eDirection.Vertical)
-				mWrapContent.itemSize = (int)vItemHeight;
+				mWrapContent.itemSize = (int)itemHeight;
 		}
 
 		//設置元件寬度
-		private void SetItemWidth (float vItemWidth)
+		private void SetItemWidth(float itemWidth)
 		{
-			mItemWidth = vItemWidth;
+			mItemWidth = itemWidth;
 
 			if (mDirection == eDirection.Horizontal)
-				mWrapContent.itemSize = (int)vItemWidth;
+				mWrapContent.itemSize = (int)itemWidth;
 		}
 
 		//設置修正X座標
-		private void SetFixX (float vFixX)
+		private void SetFixX(float fixX)
 		{
-			mFixX = vFixX;
+			mFixX = fixX;
 		}
 
 		//設置修正Y座標
-		private void SetFixY (float vFixY)
+		private void SetFixY(float fixY)
 		{
-			mFixY = vFixY;
+			mFixY = fixY;
 		}
 
 		//設置是否拖動標記
-		private void SetIsDrag (bool vIsDrag)
+		private void SetIsDrag(bool isDrag)
 		{
-			mIsDrag = vIsDrag;
+			mIsDrag = isDrag;
 
-			UIDragScrollView[] vDrag = gameObject.GetComponentsInChildren<UIDragScrollView>();
+			UIDragScrollView[] drag = gameObject.GetComponentsInChildren<UIDragScrollView>();
 
-			if (vDrag == null)
+			if (drag == null)
 				return;
 
-			for (int i = 0; i < vDrag.Length; i++)
-				vDrag[i].enabled = vIsDrag;
+			for (int i = 0; i < drag.Length; i++)
+				drag[i].enabled = isDrag;
 		}
 
 		//設置是否循環標記
-		private void SetIsRepeat (bool vIsRepeat)
+		private void SetIsRepeat(bool isRepeat)
 		{
-			mIsRepeat = vIsRepeat;
+			mIsRepeat = isRepeat;
 
 			if (mWrapContent != null)
-				mWrapContent.isRepeat = vIsRepeat;
+				mWrapContent.isRepeat = isRepeat;
 		}
 
 		//清除元件
-		public void Clear ()
+		public void Clear()
 		{
 			for (int i = 0 ; i < mContainer.Count; i++)
 			{
-				SVInfo<T> vInfo = mContainer[i];
-
-				if (vInfo == null)
+				SVInfo<T> info = mContainer[i];
+				if (info == null)
 					continue;
-
-				DestroyImmediate(vInfo.gameObject);
+				DestroyImmediate(info.gameObject);
 			}
 
 			mInfo.Clear();
@@ -366,51 +349,51 @@
 		}
 
 		//加入貼圖
-		public void AddTex (rTex vTex)
+		public void AddTex(rTex tex)
 		{
-			if (CheckNeedAddTex(vTex.Name) == false)
+			if (CheckNeedAddTex(tex.Name) == false)
 				return;
 
-			mTexPool.Add(vTex);
+			mTexPool.Add(tex);
 		}
 
 		//加入元件
-		protected void Add (SVInfo<T> vInfo, bool vIsSort)
+		protected void Add(SVInfo<T> info, bool isSort)
 		{
-			mContainer.Add(vInfo);
+			mContainer.Add(info);
 
-			int vIndex = mContainer.Count - 1;
+			int index = mContainer.Count - 1;
 
-			vInfo.ID = vIndex;
-			vInfo.Index = vIndex;
-			vInfo.transform.name = vIndex.ToString("D4");
-			vInfo.transform.parent = mWrapContent.transform;
-			vInfo.transform.localPosition = new Vector3(0, 0, 0);
-			vInfo.transform.localEulerAngles = new Vector3(0, 0, 0);
-			vInfo.transform.localScale = new Vector3(1, 1, 1);
+			info.ID = index;
+			info.Index = index;
+			info.transform.name = index.ToString("D4");
+			info.transform.parent = mWrapContent.transform;
+			info.transform.localPosition = new Vector3(0, 0, 0);
+			info.transform.localEulerAngles = new Vector3(0, 0, 0);
+			info.transform.localScale = new Vector3(1, 1, 1);
 
-			if (mWrapContent.isRepeat == false)
+			if (!mWrapContent.isRepeat)
 			{
 				mWrapContent.minIndex = 0;
-				mWrapContent.maxIndex = vIndex;
+				mWrapContent.maxIndex = index;
 			}
 
-			if (vIsSort == true)
+			if (isSort)
 				mWrapContent.SortAlphabetically();
 
 			IsDrag = CheckCanDrag();
 		}
 
 		//刪除元件
-		public void Del (int vIndex, bool vIsSort = true)
+		public void Del(int index, bool isSort = true)
 		{
-			mInfo.RemoveAt(vIndex);
+			mInfo.RemoveAt(index);
 
 			if (mInfo.Count < mContainer.Count)
 			{
-				SVInfo<T> vInfo = mContainer[vIndex];
-				mContainer.RemoveAt(vIndex);
-				DestroyImmediate(vInfo.gameObject);
+				SVInfo<T> info = mContainer[index];
+				mContainer.RemoveAt(index);
+				DestroyImmediate(info.gameObject);
 
 				for (int i = 0; i < mContainer.Count; i++)
 				{
@@ -419,86 +402,84 @@
 				}
 			}
 
-			if (mWrapContent.isRepeat == false)
+			if (!mWrapContent.isRepeat)
 			{
 				mWrapContent.minIndex = 0;
 				mWrapContent.maxIndex = mInfo.Count - 1;
 			}
 
-			if (vIsSort == true)
+			if (isSort)
 				mWrapContent.SortAlphabetically();
 
 			IsDrag = CheckCanDrag();
 		}
 
 		//校正移動索引值
-		protected virtual int FixMoveItemIndex (int vIndex)
+		protected virtual int FixMoveItemIndex(int index)
 		{
 			//檢查索引值下限
-			if (vIndex <= 0)
+			if (index <= 0)
 				return 0;
 
 			//檢查索引值上限
-			if (vIndex + mItemCount > mInfo.Count)
+			if (index + mItemCount > mInfo.Count)
 				return (mInfo.Count - mItemCount);
 
-			return vIndex;
+			return index;
 		}
 
-		protected virtual void MoveItem (int vIndex, float vSpeed, bool vIsSpring)
+		protected virtual void MoveItem(int index, float speed, bool isSpring)
 		{
-			float vX = transform.localPosition.x;
-			float vY = transform.localPosition.y;
-			float vZ = transform.localPosition.z;
+			float x = transform.localPosition.x;
+			float y = transform.localPosition.y;
+			float z = transform.localPosition.z;
 
 			//校正索引值
-			vIndex = vIndex + 1;
+			index = index + 1;
 
 			if (mDirection == eDirection.Horizontal)
 			{
-				vX = mFixX - vIndex * mItemWidth + mBounds.z + 10;
+				x = mFixX - index * mItemWidth + mBounds.z + 10;
 			}
 			else
 			{
-				vY = mFixY + vIndex * mItemHeight - mBounds.w + 10;
+				y = mFixY + index * mItemHeight - mBounds.w + 10;
 			}
 
-			if (vIsSpring == true)
+			if (isSpring)
 			{
-				SpringPanel.Begin(gameObject, new Vector3(vX, vY, vZ), vSpeed);
+				SpringPanel.Begin(gameObject, new Vector3(x, y, z), speed);
 			}
 			else
 			{
 				//檢查方向
 				if (mDirection == eDirection.Horizontal)
 				{
-					transform.localPosition = new Vector3(vX, vY, 0);
+					transform.localPosition = new Vector3(x, y, 0);
 					mPanel.baseClipRegion = mBounds;
-					mPanel.clipOffset = new Vector2(-vX, 0);
-
-					SpringPanel.Begin(gameObject, new Vector3(vX, vY, vZ), vSpeed);
+					mPanel.clipOffset = new Vector2(-x, 0);
+					SpringPanel.Begin(gameObject, new Vector3(x, y, x), speed);
 				}
 				else
 				{
-					transform.localPosition = new Vector3(vX, vY, 0);
+					transform.localPosition = new Vector3(x, y, 0);
 					mPanel.baseClipRegion = mBounds;
-					mPanel.clipOffset = new Vector2(0, -vY);
-
-					SpringPanel.Begin(gameObject, new Vector3(vX, vY, vZ), vSpeed);
+					mPanel.clipOffset = new Vector2(0, -y);
+					SpringPanel.Begin(gameObject, new Vector3(x, y, x), speed);
 				}
 			}
 		}
 
 		//移動至指定項目位置
-		public virtual void MoveToItem (int vIndex, float vSpeed = 1f, bool vIsSpring = true)
+		public virtual void MoveToItem(int index, float speed = 1f, bool isSpring = true)
 		{
 			//檢查是否可以拖動
 			IsDrag = CheckCanDrag();
 
-			if (IsDrag == false)
+			if (!IsDrag)
 				return;
 
-			MoveItem(vIndex, vSpeed, vIsSpring);
+			MoveItem(index, speed, isSpring);
 		}
 	}
 }

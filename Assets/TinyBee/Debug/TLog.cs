@@ -38,7 +38,7 @@
         }
 
         //加入訊息
-        public void Log(string vMsg)
+		public void Log(string msg)
         {
             if (mMessages == null)
                 mMessages = new List<string>();
@@ -48,7 +48,7 @@
 
             mMessageLine++;
 
-            mMessages.Add(mMessageLine.ToString("D2") + " " + vMsg);
+			mMessages.Add(mMessageLine.ToString("D2") + " " + msg);
         }
 
         public void AddLine()
