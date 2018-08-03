@@ -4,7 +4,7 @@
     using UnityEngine;
 
     [TMonoSingletonPath("[Debug]/Fps")]
-    public class TFps : TMonoBehaviour, ISingleton
+	public class TFps : TMonoBehaviour, ISingleton
     {
         private float mUpdateInterval = 0.1f;
         private double mLastInterval = 0;
@@ -21,17 +21,17 @@
             get { return MonoSingletonProperty<TFps>.Instance; }
         }
 
+		public override IManager Manager
+		{
+			get { return null; }
+		}
+
         public void OnSingletonInit()
         {
             //記錄遊戲開始時間
             mLastInterval = Time.realtimeSinceStartup;
             //初始化
             mFrameCount = 0;
-        }
-
-        protected override void SetupMgr()
-        {
-
         }
 
         private void Update()

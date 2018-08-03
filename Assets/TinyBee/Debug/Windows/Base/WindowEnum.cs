@@ -59,12 +59,12 @@
     {
         protected static readonly Dictionary<int, TWindowEnum> mTables = new Dictionary<int, TWindowEnum>();
 
-        public static TWindowEnum mNone = new TWindowEnum(0, "None");
-        public static TWindowEnum mMsg = new TWindowEnum(1, "Msg");
-        public static TWindowEnum mDevice = new TWindowEnum(2, "Device");
-        public static TWindowEnum mSystem = new TWindowEnum(3, "System");
-        public static TWindowEnum mNetwork = new TWindowEnum(4, "Network");
-        public static TWindowEnum mUI = new TWindowEnum(5, "UI");
+        protected static TWindowEnum mNone = new TWindowEnum(0, "None");
+        protected static TWindowEnum mMsg = new TWindowEnum(1, "Msg");
+        protected static TWindowEnum mDevice = new TWindowEnum(2, "Device");
+        protected static TWindowEnum mSystem = new TWindowEnum(3, "System");
+        protected static TWindowEnum mNetwork = new TWindowEnum(4, "Network");
+        protected static TWindowEnum mUI = new TWindowEnum(5, "UI");
 
         public static int None { get { return mNone.value; } }
         public static int Msg { get { return mMsg.value; } }

@@ -17,43 +17,18 @@
 				TMsg msg = param[0] as TMsg;
 				ProcessMsg(eventId, msg);
 				msg.Processed = true;
-				
 				if (msg.ReuseAble)
-				{
 					msg.Recycle2Cache();
-				}
 			}
 		}
 
 		protected virtual void ProcessMsg(int eventId, TMsg msg) {}
 
-		protected abstract void SetupMgr();
-		
-		private TMgrBehaviour mPrivateMgr = null;
-		
-		protected TMgrBehaviour mCurMgr 
-		{
-			get 
-			{
-				if (mPrivateMgr == null) 
-				{
-					SetupMgr();
-				}
-
-				if (mPrivateMgr == null) 
-				{
-                    mLogger.LogError("not set mgr yet");
-				}
-
-				return mPrivateMgr;
-			}
-
-			set { mPrivateMgr = value; }
-		}
+		public abstract IManager Manager { get; }
 			
 		public virtual void Show()
 		{
-			gameObject.SetActive (true);
+			gameObject.SetActive(true);
 
 			OnShow();
 		}
@@ -81,37 +56,37 @@
 
 		protected void RegisterEvent<T>(T eventId) where T : IConvertible
 		{
-			mEventIds.Add(eventId.ToUInt16(null));
-			mCurMgr.RegisterEvent(eventId, Process);
+			mCachedEventIds.Add(eventId.ToUInt16(null));
+			Manager.RegisterEvent(eventId, Process);
 		}
 		
 		protected void UnRegisterEvent<T>(T eventId) where T : IConvertible
 		{
-			mEventIds.Remove(eventId.ToUInt16(null));
-			mCurMgr.UnRegistEvent(eventId.ToInt32(null), Process);
+			mCachedEventIds.Remove(eventId.ToUInt16(null));
+			Manager.UnRegistEvent(eventId.ToInt32(null), Process);
 		}
 
 		protected void UnRegisterAllEvent()
 		{
 			if (null != mPrivateEventIds)
 			{
-				mCurMgr.UnRegisterEvents(mEventIds, Process);
+				mPrivateEventIds.ForEach(id => Manager.UnRegistEvent(id, Process));
 			}
 		}
 
 		public virtual void SendMsg(TMsg msg)
 		{
-			mCurMgr.SendMsg(msg);
+			Manager.SendMsg(msg);
 		}
 
         public virtual void SendEvent<T>(T eventId) where T : IConvertible
 		{
-			mCurMgr.SendEvent(eventId);
+			Manager.SendEvent(eventId);
 		}
 		
 		private List<ushort> mPrivateEventIds = null;
 		
-		private List<ushort> mEventIds
+		private List<ushort> mCachedEventIds
 		{
 			get
 			{
@@ -127,8 +102,7 @@
 		protected virtual void OnDestroy()
 		{
 		    OnBeforeDestroy();
-			mCurMgr = null;
-			
+
 			if (Application.isPlaying) 
 			{
 				UnRegisterAllEvent();

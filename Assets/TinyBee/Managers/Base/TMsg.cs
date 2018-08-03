@@ -11,7 +11,7 @@ namespace TinyBee
 		
 		public int ManagerID
 		{
-			get { return EventID / QMsgSpan.Count * QMsgSpan.Count; }
+			get { return EventID /*/ QMsgSpan.Count * QMsgSpan.Count*/; }
 		}
 
 		public TMsg(){}

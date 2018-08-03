@@ -17,6 +17,11 @@
 			get { return MonoSingletonProperty<DebugMgr>.Instance; }
 		}
 
+		public override int ManagerId
+		{
+			get { return MgrEnumBase.Debug; }
+		}
+
 		public void OnSingletonInit() {}
 
         public override void Init(params object[] param)
@@ -26,16 +31,13 @@
 
             mWindowTable = new Dictionary<int, TWindow>
 			{
-				//觸發事件接在這
 				{WindowEnumBase.Msg, new MsgWindow(WindowEnumBase.Msg, "Window_MSG", new Rect(200, 50, 400, 450), false)},
                 {WindowEnumBase.Device, new DeviceWindow(WindowEnumBase.Device, "Window_DEVICE", new Rect(200, 50, 400, 450), false)},
                 {WindowEnumBase.UI, new UIWindow(WindowEnumBase.UI, "Window_UI", new Rect(200, 50, 400, 450), false)}
             };
-		}
 
-		protected override void SetupMgrId()
-		{
-			mMgrId = MgrEnumBase.Debug;
+			if (param != null)
+				param.ForEach(p => mWindowTable.Add(((TWindow)p).Id, (TWindow)p));
 		}
 
 		protected override void OnBeforeDestroy()
@@ -46,6 +48,8 @@
                 mWindowTable.Clear();
 				mWindowTable = null;
 			}
+
+			base.OnBeforeDestroy();
 		}
 
 		public void OnGUI()

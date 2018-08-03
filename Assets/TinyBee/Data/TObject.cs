@@ -8,32 +8,25 @@
 
 	public class TObject : IDisposable
 	{
-		private string mErr = null;
-		private WWW mBundle = null;
-		private GameObject mObj = null;
-
 		public string Err { get; set; }
 		public WWW Bundle { get; set; }
-		public GameObject Obj { get; set; }
 
 		//建構子
-		public TObject ()
+		public TObject()
 		{
-			mErr = null;
-			mBundle = null;
-			mObj = null;
+			Err = null;
+			Bundle = null;
 		}
 
 		//清除內容
-		public void Clear ()
+		public void Clear()
 		{
-			mErr = null;
-			mBundle = null;
-			mObj = null;
+			Err = null;
+			Bundle = null;
 		}
 
 		//釋放
-		public void Dispose ()
+		public void Dispose()
 		{
 			Clear();
 		}

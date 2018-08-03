@@ -4,20 +4,24 @@
 	using System.Collections.Generic;
     using System;
     using UI;
+	using UI.Enum;
     using UnityEngine;
 
     public enum eUIParam
     {
         None = 0,
         Standard = 1,
-        Top = 2,
-        Blur = 4,
-        Mask = 8
+        Main = 2,
+        Top = 4,
+        Blur = 8,
+        Mask = 16
     }
 
     [TMonoSingletonPath("[UI]/UIMgr")]
     public class UIMgr : TMgrBehaviour, ISingleton
     {
+		public static string[] CAMERAKEYS = new string[] {"Main", "Top", "Else"};
+
         private List<TUIInfo> mInfoList = null;                   //
 		[SerializeField]
         private List<UIForm> mForms = null;                       //
@@ -33,24 +37,13 @@
         private Dictionary<string, AssetBundle> mFontMap = null;          //
         private Dictionary<string, AssetBundle> mStandardAtlasMap = null; //
         private Dictionary<string, AssetBundle> mAtlasMap = null;         //
-
-        private Camera mMainCamera = null;                        //
-        private Camera mTopCamera = null;                         //
-
-        private Func<bool> mCheckNeedBlurFunc = null;
-        private Func<bool> mCheckNeedMaskFunc = null;
-        private Func<bool> mCheckNeedShowTutorialFunc = null;
-        private Func<bool> mCheckNeedShowMenuDotlFunc = null;
+		private Dictionary<string, Camera> mCameraMap = null;
 
         public int FormCount { get { return mForms.Count; } }
         public int FontCount { get { return mFontMap.Count; } }
         public int StandardAtlasCount { get { return mStandardAtlasMap.Count; } }
         public int AtlasCount { get { return mAtlasMap.Count; } }
-
-        public Camera MainCamera { get { return mMainCamera; } set { SetMainCamera(value); } }
-        public Camera TopCamera { get { return mTopCamera; } set { SetTopCamera(value); } }
 #if _BLUR
-		public Camera BlurCamera { get; set; }
 		public Blur Blur { get; set; }
 #endif
 		public Material Skybox { get; private set;}
@@ -66,6 +59,11 @@
 			get { return MonoSingletonProperty<UIMgr>.Instance; }
 		}
 
+		public override int ManagerId
+		{
+			get { return MgrEnumBase.UI; }
+		}
+
 		public void OnSingletonInit() {}
 
 		public override void Init(params object[] param)
@@ -79,7 +77,7 @@
                 new TUIInfo(UIEnumBase.Loading, "UI_Loading", typeof(UILoading), eUIParam.Standard|eUIParam.Top|eUIParam.Mask|eUIParam.Blur, 900, 0),
                 new TUIInfo(UIEnumBase.Connecting, "UI_Connecting", typeof(UIConnecting), eUIParam.Standard|eUIParam.Top|eUIParam.Mask|eUIParam.Blur, 800, 0),
                 new TUIInfo(UIEnumBase.Bubble, "UI_Bubble", typeof(UIBubble), eUIParam.Standard|eUIParam.Top, 700, 0),
-				new TUIInfo(UIEnumBase.Msg, "UI_Msg", typeof(UIMsg), eUIParam.Mask|eUIParam.Blur, 0, 3),
+				new TUIInfo(UIEnumBase.Msg, "UI_Msg", typeof(UIMsg), eUIParam.Main|eUIParam.Mask|eUIParam.Blur, 0, 3),
 				new TUIInfo(UIEnumBase.Controller, "UI_Controller", typeof(UIController), eUIParam.Standard|eUIParam.Top, 1000, 0),
 				new TUIInfo(UIEnumBase.Tutorial, "UI_Tutorial", typeof(UITutorial), eUIParam.Standard|eUIParam.Top, 500, 1)
             };
@@ -97,14 +95,10 @@
 #if _MASK
 			mMaskStacks = new TStack<UIForm>();
 #endif
-            mFontMap = new Dictionary<string, AssetBundle>();
-            mStandardAtlasMap = new Dictionary<string, AssetBundle>();
-            mAtlasMap = new Dictionary<string, AssetBundle>();
-        }
-
-		protected override void SetupMgrId()
-		{
-            mMgrId = MgrEnumBase.UI;
+            mFontMap = new Dictionary<string,AssetBundle>();
+            mStandardAtlasMap = new Dictionary<string,AssetBundle>();
+            mAtlasMap = new Dictionary<string,AssetBundle>();
+			mCameraMap = new Dictionary<string,Camera>();
         }
 
         protected override void OnBeforeDestroy()
@@ -122,20 +116,23 @@
             mFontMap.Free();
             mStandardAtlasMap.Free();
             mAtlasMap.Free();
+            mCameraMap.Free();
+
+            base.OnBeforeDestroy();
         }
 
         //取得UI資訊
-        private TUIInfo GetUIInfo(TUIEnum vUIEnum)
+		private TUIInfo GetUIInfo(TUIEnum vUI)
         {
-            return vUIEnum != null ? GetUIInfo(vUIEnum.value) : null;
+			return vUI != null ? GetUIInfo(vUI.value) : null;
         }
 
         //取得UI資訊
-        private TUIInfo GetUIInfo(int vUIEnum)
+		private TUIInfo GetUIInfo(int vUI)
         {
             for (int i = 0; i < mInfoList.Count; i++)
             {
-                if (mInfoList[i].ui != vUIEnum)
+				if (mInfoList[i].ui != vUI)
                     continue;
 
                 return mInfoList[i];
@@ -144,11 +141,11 @@
         }
 
         //取得UI名稱
-        private string GetUIName(TUIEnum vUIEnum)
+		private string GetUIName(TUIEnum vUI)
         {
             for (int i = 0; i < mInfoList.Count; i++)
             {
-                if (mInfoList[i].ui != vUIEnum.value)
+				if (mInfoList[i].ui != vUI.value)
                     continue;
 
                 return mInfoList[i].name;
@@ -170,17 +167,17 @@
         }
 
         //取得UI
-        public UIForm GetUI(TUIEnum vUIEnum)
+		public UIForm GetUI(TUIEnum vUI)
         {
-            return vUIEnum != null ? GetUI(vUIEnum.value) : null;
+			return vUI != null ? GetUI(vUI.value) : null;
         }
 
         //取得UI
-        public UIForm GetUI(int vUIEnum)
+        public UIForm GetUI(int vUI)
         {
             for (int i = 0; i < mForms.Count; i++)
             {
-                if (mForms[i].UIEnum != vUIEnum)
+                if (mForms[i].UI != vUI)
                     continue;
 
                 return mForms[i];
@@ -195,10 +192,13 @@
 
 		public Transform GetParent(eUIParam vParam)
         {
-            if ((vParam & eUIParam.Top) == eUIParam.Top)
-                return mTopCamera != null ? mTopCamera.transform : null;
+			if ((vParam & eUIParam.Top) == eUIParam.Top)
+				return GetCamera("Top").transform;
 
-            return mMainCamera != null ? mMainCamera.transform : null;
+            if ((vParam & eUIParam.Main) == eUIParam.Main)
+				return GetCamera("Main").transform;
+
+            return null;
         }
 
         public string GetFormString()
@@ -206,24 +206,6 @@
             string str = "\n";
             mForms.ForEach(m => str += m.ToString() + "\n");
             return str;
-        }
-
-        private void SetMainCamera(Camera vMainCamera)
-        {
-            mMainCamera = vMainCamera;
-
-//#if _SEPARATE
-//            AddCam(vMainCamera, 1);
-//#endif
-        }
-
-        private void SetTopCamera(Camera vTopCamera)
-        {
-            mTopCamera = vTopCamera;
-
-//#if _SEPARATE
-//            AddCam(vBoxCamera, 2);
-//#endif
         }
 
 		public void PushUI(UIForm vForm, int vParam)
@@ -238,7 +220,7 @@
             if ((vParam & eUIParam.Standard) == eUIParam.Standard)
                 mStandards.Add(vForm);
 
-            if ((vParam & eUIParam.Top) != eUIParam.Top)
+            if ((vParam & eUIParam.Main) == eUIParam.Main)
                 mMainStacks.Push(vForm);
 
             if ((vParam & eUIParam.Top) == eUIParam.Top)
@@ -254,12 +236,12 @@
 #endif
         }
 
-		public UIForm PopUI(int vUIEnum)
+		public UIForm PopUI(int vUI)
         {
             UIForm vForm = null;
             for (int i = 0; i < mForms.Count; i++)
             {
-                if (mForms[i].UIEnum != vUIEnum)
+                if (mForms[i].UI != vUI)
                     continue;
 
                 vForm = mForms[i];
@@ -385,6 +367,40 @@
             return tmp;
         }
 
+		public bool PushCamera(string key, Camera camera)
+		{
+			if (mCameraMap.ContainsKey(key))
+				return false;
+
+			mCameraMap.Add(key, camera);
+			return true;
+		}
+
+		public Camera GetCamera(string key)
+		{
+			if (!mCameraMap.ContainsKey(key))
+				return null;
+
+			Camera tmp;
+			if (!mCameraMap.TryGetValue(key, out tmp))
+				return null;
+			
+			return tmp;
+		}
+
+		public Camera PopCamera(string key)
+		{
+			if (!mCameraMap.ContainsKey(key))
+				return null;
+
+			Camera tmp;
+			if (!mCameraMap.TryGetValue(key, out tmp))
+				return null;
+
+			mCameraMap.Remove(key);
+			return tmp;
+		}
+
 		public void SortUI()
         {
             int vDepth = 0;
@@ -403,9 +419,9 @@
 #endif
         }
 
-        public void OpenUI(int vUIEnum, params object[] param)
+		public void OpenUI(int vUI, params object[] param)
         {
-            UIForm vForm = PopUI(vUIEnum);
+			UIForm vForm = PopUI(vUI);
             if (vForm != null)
             {
                 PushUI(vForm, vForm.Param);
@@ -413,10 +429,10 @@
                 return;
             }
 
-            TUIInfo vInfo = GetUIInfo(vUIEnum);
+			TUIInfo vInfo = GetUIInfo(vUI);
             if (vInfo == null || vInfo.ui == UIEnumBase.None)
             {
-                mLogger.Log(string.Format("OpenUI Err -> {0}", UIEnumBase.GetEnumName(vUIEnum)));
+				mLogger.Log(string.Format("OpenUI Err -> {0}", UIEnumBase.GetEnumName(vUI)));
                 return;
             }
 
@@ -426,9 +442,9 @@
             vForm.OpenUI(param);
         }
 
-        public IEnumerator IOpenUI(int vUIEnum, object vValue = null)
+        public IEnumerator IOpenUI(int vUI, object vValue = null)
         {
-            UIForm vForm = PopUI(vUIEnum);
+			UIForm vForm = PopUI(vUI);
             if (vForm != null)
             {
                 PushUI(vForm, vForm.Param);
@@ -436,10 +452,10 @@
                 yield return null;
             }
 
-            TUIInfo vInfo = GetUIInfo(vUIEnum);
+			TUIInfo vInfo = GetUIInfo(vUI);
             if (vInfo == null || vInfo.ui == UIEnumBase.None)
             {
-                mLogger.Log(string.Format("OpenUI Err -> {0}", UIEnumBase.GetEnumName(vUIEnum)));
+				mLogger.Log(string.Format("OpenUI Err -> {0}", UIEnumBase.GetEnumName(vUI)));
                 yield return null;
             }
 
@@ -449,9 +465,9 @@
             yield return CoroutineMgr.Instance.StartCoroutine(vForm.IOpenUI(vValue));
         }
 
-        public void CloseUI(int vUIEnum, params object[] param)
+		public void CloseUI(int vUI, params object[] param)
         {
-            UIForm vForm = PopUI(vUIEnum);
+			UIForm vForm = PopUI(vUI);
             if (vForm != null)
             {
                 vForm.CloseUI(param);
@@ -459,18 +475,9 @@
             }
 
 			SortUI();
-
-//#if _BLUR
-//			if (mBlurStacks.Top != null && !mBlurStacks.Top.Hidden)
-//				mBlurStacks.Top.Blur = true;
-//#endif
-//#if _MASK
-//			if (mMaskStacks.Top != null)
-//				mMaskStacks.Top.Mask = true;
-//#endif
         }
 
-        public void ResetALL(int vRank, int vUIEnum = 0, params object[] param)
+        public void ResetALL(int vRank, int vUI = 0, params object[] param)
         {
             List<UIForm> tmp = new List<UIForm>();
             for (int i = 0; i < mForms.Count; i++)
@@ -481,7 +488,7 @@
                 tmp.Add(mForms[i]);
             }
 
-            tmp.ForEach(m => { PopUI(m.UIEnum); m.CloseUI(); });
+            tmp.ForEach(m => { PopUI(m.UI); m.CloseUI(); });
 
             Resources.UnloadUnusedAssets();
 
@@ -489,20 +496,11 @@
 
 			SortUI();
 
-//#if _BLUR
-//			if (mBlurStacks.Top != null && !mBlurStacks.Top.Hidden)
-//				mBlurStacks.Top.Blur = true;
-//#endif
-//#if _MASK
-//			if (mMaskStacks.Top != null)
-//				mMaskStacks.Top.Mask = true;
-//#endif
-
-            UIForm vForm = PopUI(vUIEnum);
+            UIForm vForm = PopUI(vUI);
 			if (vForm == null)
             {
-				if (vUIEnum != UIEnumBase.None)
-                	OpenUI(vUIEnum, param);
+				if (vUI != UIEnumBase.None)
+                	OpenUI(vUI, param);
             }
             else
             {
@@ -511,9 +509,9 @@
             }
         }
 
-        public void ShowUI(int vUIEnum)
+		public void ShowUI(int vUI)
         {
-            UIForm vForm = GetUI(vUIEnum);
+			UIForm vForm = GetUI(vUI);
 
             if (vForm == null)
                 return;
@@ -521,9 +519,9 @@
             vForm.Hidden = false;
         }
 
-        public void HideUI(int vUIEnum)
+		public void HideUI(int vUI)
         {
-            UIForm vForm = GetUI(vUIEnum);
+			UIForm vForm = GetUI(vUI);
 
             if (vForm == null)
                 return;

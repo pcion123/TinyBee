@@ -48,7 +48,7 @@
 			mIsPaused = true;
 		}
 
-		public void UnPause()
+		public void Resume()
 		{
 			mIsPaused = false;
 		}
@@ -63,7 +63,7 @@
 			return mCoroutine;
 		}
 
-		public void Stop()
+		public void Shutdown()
 		{
 			mIsStopped = true;
 			mIsRunning = false;
@@ -157,12 +157,12 @@
 			get { return MonoSingletonProperty<CoroutineMgr>.Instance; }
 		}
 
-		public void OnSingletonInit() {}
-
-		protected override void SetupMgrId()
+		public override int ManagerId
 		{
-            mMgrId = MgrEnumBase.Coroutine;
-        }
+			get { return MgrEnumBase.Coroutine; }
+		}
+
+		public void OnSingletonInit() {}
 
 		protected override void OnBeforeDestroy()
 		{
@@ -170,6 +170,7 @@
 
             mContainer.Free();
 
+            base.OnBeforeDestroy();
         }
 
 		public Coroutine StartCoroutine(out TCoroutine coroutine, object custom, IEnumerator enumerator, Action<bool> onFinished = null, Action onTimeup = null, int timer = 0)
@@ -228,7 +229,7 @@
 			int vIndex = mContainer.IndexOf(coroutine);
 
 			if (vIndex >= 0)
-                coroutine.Stop();
+				coroutine.Shutdown();
 		}
 
 		public void StopCoroutineEx(object custom)
@@ -238,7 +239,7 @@
 				if ((mContainer[i].Custom == null) || (mContainer[i].Custom != custom))
 					continue;
 
-				mContainer[i].Stop();
+				mContainer[i].Shutdown();
 			}
 		}
 
@@ -249,7 +250,7 @@
 
 			for (int i = mContainer.Count - 1; i >= 0; i--)
 			{
-				mContainer[i].Stop();
+				mContainer[i].Shutdown();
 			}
 		}
 	}

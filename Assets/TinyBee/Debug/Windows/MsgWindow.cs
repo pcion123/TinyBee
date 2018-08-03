@@ -109,9 +109,9 @@
             GUI.DragWindow();
         }
 
-        protected override void DrawButton()
+		protected override void DrawButton(int id, Rect rect)
         {
-            base.DrawButton();
+			base.DrawButton(id, rect);
 
             if (GUI.Button(new Rect(mRect.x - 72, mRect.y + 36 * 1, 72, 36), "Log"))
             {
