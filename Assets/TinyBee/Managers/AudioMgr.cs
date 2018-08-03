@@ -121,12 +121,12 @@
 			get { return MonoSingletonProperty<AudioMgr>.Instance; }
 		}
 
-		public void OnSingletonInit() {}
-
-		protected override void SetupMgrId()
+		public override int ManagerId
 		{
-            mMgrId = MgrEnumBase.Audio;
-        }
+			get { return MgrEnumBase.Audio; }
+		}
+
+		public void OnSingletonInit() {}
 
 		protected override void OnBeforeDestroy()
 		{
@@ -135,6 +135,8 @@
                 mContainer.Clear();
                 mContainer = null;
 			}
+
+			base.OnBeforeDestroy();
 		}
 
 		private void SetIsMusic(bool vIsMusic)

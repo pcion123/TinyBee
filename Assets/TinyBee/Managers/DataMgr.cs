@@ -20,37 +20,50 @@
 			get { return MonoSingletonProperty<DataMgr>.Instance; }
 		}
 
+		public override int ManagerId
+		{
+			get { return MgrEnumBase.Data; }
+		}
+
 		public void OnSingletonInit() {}
 
-        protected override void SetupMgrId()
+		public string GetDataName(eLanguage language, string dataName)
 		{
-            mMgrId = MgrEnumBase.Data;
-        }
+			return string.Format("{0}_{1}", language.ToString(), dataName);
+		}
 
-        public TLoader<T> Get<T>(string key)
+		public T Get<T>(string key)
         {
+			if (!mTables.ContainsKey(key))
+				return default(T);
+			
             object loader = null;
-            
             if (!mTables.TryGetValue(key, out loader))
-                return null;
+				return default(T);
 
-            return (TLoader<T>)loader;
+            return (T)loader;
         }
 
-        public void Add<T>(string key, TLoader<T> loader)
+        public bool Push<T>(string key, T loader)
         {
-            if (!mTables.ContainsKey(key))
-                return;
+            if (mTables.ContainsKey(key))
+				return false;
 
             mTables.Add(key, loader);
+			return true;
         }
 
-        public void Del(string key)
+		public T Pop<T>(string key)
         {
             if (!mTables.ContainsKey(key))
-                return;
+				return default(T);
+
+			object loader = null;
+			if (!mTables.TryGetValue(key, out loader))
+				return default(T);
 
             mTables.Remove(key);
+			return (T)loader;
         }
 
         //載入資源
@@ -106,7 +119,6 @@
         public IEnumerator ILoadBundle(string vPath, string vName, TObject vObj)
         {
             IEnumerator vEnumerator = ILoad(vPath, vName + ".unity3d", vObj);
-
             while ((vEnumerator != null) && (vEnumerator.MoveNext()))
                 yield return vEnumerator.Current;
         }
@@ -114,7 +126,6 @@
         public IEnumerator ILoadTexture(string vPath, string vName, TObject vObj)
         {
             IEnumerator vEnumerator = ILoad(vPath, vName + ".png", vObj);
-
             while ((vEnumerator != null) && (vEnumerator.MoveNext()))
                 yield return vEnumerator.Current;
         }
@@ -122,7 +133,6 @@
         public IEnumerator ILoadData(string vPath, string vName, TObject vObj)
         {
             IEnumerator vEnumerator = ILoad(vPath, vName + ".dat", vObj);
-
             while ((vEnumerator != null) && (vEnumerator.MoveNext()))
                 yield return vEnumerator.Current;
         }
@@ -130,7 +140,6 @@
         public IEnumerator ILoadMP3(string vPath, string vName, TObject vObj)
         {
             IEnumerator vEnumerator = ILoad(vPath, vName + ".mp3", vObj);
-
             while ((vEnumerator != null) && (vEnumerator.MoveNext()))
                 yield return vEnumerator.Current;
         }

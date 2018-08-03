@@ -19,11 +19,11 @@
             get { return MonoSingletonProperty<NetMgr>.Instance; }
         }
 
-        public void OnSingletonInit() { }
+		public override int ManagerId
+		{
+			get { return MgrEnumBase.Net; }
+		}
 
-        protected override void SetupMgrId()
-        {
-            mMgrId = MgrEnumBase.Net;
-        }
+        public void OnSingletonInit() { }
     }
 }

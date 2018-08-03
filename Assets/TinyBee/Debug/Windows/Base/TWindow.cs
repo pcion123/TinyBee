@@ -25,7 +25,7 @@
         public virtual void Dispose() {}
 
         protected abstract void DrawWindow(int id);
-        protected virtual void DrawButton()
+		protected virtual void DrawButton(int id, Rect rect)
         {
             //繪製視窗關閉按鈕
             if (GUI.Button(new Rect(mRect.x - 72, mRect.y, 72, 36), "x"))
@@ -40,7 +40,7 @@
             {
                 mRect = GUILayout.Window(mId, mRect, DrawWindow, mTitle);
 
-                DrawButton();
+				DrawButton(mId, mRect);
             }
         }
     }

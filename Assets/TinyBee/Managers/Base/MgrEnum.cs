@@ -59,14 +59,15 @@
     {
         protected static readonly Dictionary<int, TMgrEnum> mTables = new Dictionary<int, TMgrEnum>();
 
-        public static TMgrEnum mNone = new TMgrEnum(0, "None");
-        public static TMgrEnum mDebug = new TMgrEnum(1, "Debug");
-        public static TMgrEnum mGame = new TMgrEnum(2, "Game");
-        public static TMgrEnum mCoroutine = new TMgrEnum(3, "Coroutine");
-        public static TMgrEnum mAudio = new TMgrEnum(4, "Audio");
-        public static TMgrEnum mData = new TMgrEnum(5, "Data");
-        public static TMgrEnum mNet = new TMgrEnum(6, "Net");
-        public static TMgrEnum mUI = new TMgrEnum(7, "UI");
+        protected static TMgrEnum mNone = new TMgrEnum(0, "None");
+        protected static TMgrEnum mDebug = new TMgrEnum(1, "Debug");
+        protected static TMgrEnum mGame = new TMgrEnum(2, "Game");
+        protected static TMgrEnum mCoroutine = new TMgrEnum(3, "Coroutine");
+        protected static TMgrEnum mAudio = new TMgrEnum(4, "Audio");
+        protected static TMgrEnum mData = new TMgrEnum(5, "Data");
+        protected static TMgrEnum mNet = new TMgrEnum(6, "Net");
+        protected static TMgrEnum mUI = new TMgrEnum(7, "UI");
+        protected static TMgrEnum mDownloader = new TMgrEnum(8, "Downloader");
 
         public static int None { get { return mNone.value; } }
         public static int Debug { get { return mDebug.value; } }
@@ -76,6 +77,7 @@
         public static int Data { get { return mData.value; } }
         public static int Net { get { return mNet.value; } }
         public static int UI { get { return mUI.value; } }
+        public static int Downloader { get { return mDownloader.value; } }
 
         static MgrEnumBase()
         {
@@ -88,7 +90,8 @@
                 { mAudio.value, mAudio },
                 { mData.value, mData },
                 { mNet.value, mNet },
-                { mUI.value, mUI }
+                { mUI.value, mUI },
+                { mDownloader.value, mDownloader }
             };
         }
 

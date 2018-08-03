@@ -47,7 +47,7 @@
     {
         protected ILogger mLogger = TLogger.Instance; //
         protected UIMgr mMgr = null;                  //UI管理
-        protected int mUIEnum = 0;                    //UI類型
+        protected int mUI = 0;                        //UI類型
         private string mUIName = null;                //UI名稱
 		protected Transform mParent = null;           //
 		protected int mMinDepth = 0;                  //最低深度
@@ -60,7 +60,7 @@
 		private GameObject mMask = null;              //
 #endif
 
-        public int UIEnum { get { return mUIEnum; } }
+		public int UI { get { return mUI; } }
         public string UIName { get { return mUIName; } }
         public int Param { get { return mParam; } }
         public int Rank { get { return mRank; } }
@@ -113,7 +113,7 @@
 
         public override string ToString()
         {
-            return string.Format("{0}  IsHidden={1}  Min={2}  Max={3}  Offset={4}  Rank={5}", mUIName, !gameObject.activeSelf, mMinDepth, mMaxDepth, mOffsetDepth, mRank);
+            return string.Format("{0}  Hidden={1}  Min={2}  Max={3}  Offset={4}", mUIName, !gameObject.activeSelf, mMinDepth, mMaxDepth, mOffsetDepth);
         }
 
         void OnDestroy()
@@ -150,7 +150,7 @@
         }
 
         //設置圖層深度
-        public void SetDepth(GameObject vObj)
+		public virtual void SetDepth(GameObject vObj)
         {
 			Mask = true;
             UIPanel[] vPanels = vObj.GetComponentsInChildren<UIPanel>();
@@ -198,10 +198,10 @@
         }
 
         //初始化
-        public void Init(UIMgr vMgr, int vUIEnum, string vUIName, Transform vParent, int vParam, int vDepth, int vRank)
+        public void Init(UIMgr vMgr, int vUI, string vUIName, Transform vParent, int vParam, int vDepth, int vRank)
         {
             mMgr = vMgr;
-            mUIEnum = vUIEnum;
+            mUI = vUI;
             mUIName = vUIName;
             mMinDepth = vDepth;
             mMaxDepth = vDepth;
@@ -240,27 +240,10 @@
         //關閉介面
         public virtual void CloseUI(params object[] param)
         {
-//#if _SEPARATE
-//            Camera[] vCameras = transform.GetComponentsInChildren<Camera>();
-
-//            if (vCameras != null)
-//            {
-//                for (int i = 0; i < vCameras.Length; i++)
-//                {
-//                    DelToCam(vCameras[i], 1);
-//                    DelToCam(vCameras[i], 2);
-//                }
-//            }
-
-//            mUIMgr.IsActive = false;
-//#endif
-
 			mParent = null;
-
 #if _MASK
 			mMask = null;
 #endif
-
             this.DestroyGameObjGracefully();
         }
 
@@ -275,6 +258,7 @@
 		//建立介面
 		protected virtual IEnumerator IBuildUIBefore(params object[] param)
 		{
+			mIsLoading = true;
 			mMgr.ShowLoading(gameObject);
 #if _MASK
 			eUIParam p = (eUIParam)mParam;
@@ -293,6 +277,7 @@
 			mMgr.HideLoading(gameObject);
 			mMgr.PushUI(this, mParam);
 			mMgr.SortUI();
+			mIsLoading = false;
 		}
 
         //建立介面
@@ -303,7 +288,7 @@
 		protected IEnumerator IBuildMask()
 		{
 			TObject vObj = new TObject();
-			string vPath = Application.streamingAssetsPath + "/" + GameMgr.Instance.LanguagePath + "/Common/UIs/Panels/";
+			string vPath = Application.streamingAssetsPath + "/" + GameMgr.Instance.LanguagePath + "/Main/Common/UIs/Panels/";
 			AssetBundle vBundle = mMgr.GetStandardAtlas("Panel_Mask-Atlas");
 			if (vBundle == null)
 			{
@@ -354,30 +339,6 @@
 
             return vTarget == null ? null : vTarget.gameObject;
         }
-
-        //#if _SEPARATE
-        //        //加入攝影機
-        //        public bool AddToCam(Camera vCamera, int vDisplay)
-        //        {
-        //            if (vCamera == null)
-        //                return false;
-
-        //            mMgr.AddCam(vCamera, vDisplay);
-
-        //            return true;
-        //        }
-
-        //        //移除攝影機
-        //        public bool DelToCam(Camera vCamera, int vDisplay)
-        //        {
-        //            if (vCamera == null)
-        //                return false;
-
-        //            mMgr.DelCam(vCamera, vDisplay);
-
-        //            return true;
-        //        }
-        //#endif
 
         //掛載節點
 		protected bool AddToBone(GameObject vObject, string vPath = null)

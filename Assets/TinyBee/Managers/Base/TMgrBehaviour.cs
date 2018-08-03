@@ -11,29 +11,16 @@ namespace TinyBee
 
         public virtual void Init(params object[] param) {}
 
-        [UnityEngine.SerializeField]
-        protected int mMgrId = MgrEnumBase.None;
+		public abstract int ManagerId { get ; }
 
-		protected abstract void SetupMgrId();
-
-		protected override void SetupMgr()
+		public override IManager Manager
 		{
-			mCurMgr = this;
+			get { return this; }
 		}
 
 		protected TMgrBehaviour() 
 		{
             mLogger = TLogger.Instance;
-
-			SetupMgrId();
-		}
-
-		public void RegisterEvents<T>(IEnumerable<T> eventIds, OnEvent process) where T : IConvertible
-		{
-			foreach (var eventId in eventIds)
-			{
-				RegisterEvent(eventId, process);
-			}
 		}
 
 		public void RegisterEvent<T>(T msgId, OnEvent process) where T : IConvertible
@@ -41,33 +28,25 @@ namespace TinyBee
 			mEventSystem.Register(msgId, process);
 		}
 
-		public void UnRegisterEvents(List<ushort> msgs, OnEvent process)
-		{
-			for (int i = 0; i < msgs.Count; i++)
-			{
-				UnRegistEvent(msgs[i], process);
-			}
-		}
-
-		public void UnRegistEvent(int msgEvent, OnEvent process)
+		public void UnRegistEvent<T>(T msgEvent, OnEvent process) where T : IConvertible
 		{
 			mEventSystem.UnRegister(msgEvent, process);
 		}
 
 		public override void SendMsg(TMsg msg)
 		{
-            if (msg.ManagerID == mMgrId)
+			if (msg.ManagerID == ManagerId)
 			{
-                Process(msg.EventID, msg);
+				Process(msg.EventID, msg);
 			}
 			else 
 			{
-				QMsgCenter.Instance.SendMsg(msg);
+				//QMsgCenter.Instance.SendMsg(msg);
 			}
 		}
 
-        public override void SendEvent<T>(T eventId)
-	    {
+		public override void SendEvent<T>(T eventId)
+		{
 			SendMsg(TMsg.Allocate(eventId));
 		}
 
@@ -75,6 +54,12 @@ namespace TinyBee
 		protected override void ProcessMsg(int eventId, TMsg msg)
 		{
 			mEventSystem.Send(msg.EventID, msg);
+		}
+
+		protected override void OnBeforeDestroy()
+		{
+			if (mEventSystem.IsNotNull())
+				mEventSystem.OnRecycled();
 		}
 	}
 }

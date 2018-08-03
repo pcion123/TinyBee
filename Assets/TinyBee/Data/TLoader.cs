@@ -14,33 +14,23 @@
 
 		public void Dispose()
 		{
-			if (mDataList != null)
-			{
-				mDataList.Clear();
-				mDataList = null;
-			}
+			mDataList.Free();
 		}
 
 		//讀Json -> 開放給外界使用
 		public void LoadJson(byte[] vByteArray)
 		{
 			vByteArray = TFile.XOR(vByteArray);
-
 			using (MemoryStream vStream = new MemoryStream(vByteArray))
 			{
 				using (StreamReader vReader = new StreamReader(vStream, System.Text.UTF8Encoding.UTF8))
 				{
-					//GameInfos.Log("Load File: " + typeof(T));
-
 					string vStr = vReader.ReadToEnd();
-
 					if (vStr.Trim() == "[]")
 						return;
-
 					LoadJson(vStr);
 				}
 			}
-
 			Analyze();
 		}
 
@@ -63,7 +53,7 @@
 		//依Key取得Data
 		public abstract T GetDataByKey(int vKey);
 
-		protected abstract void Analyze();
+		protected virtual void Analyze() {}
 
 		//依Index取得Data
 		public T GetDataByIndex(int vIndex)

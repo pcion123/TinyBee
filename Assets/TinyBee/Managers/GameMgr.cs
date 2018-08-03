@@ -35,16 +35,23 @@
         private eLanguage mLanguage = eLanguage.NONE;       //語言版本標記
         private string mLanguagePath = null;                //語言版本路徑
         private string mDataPath = null;                    //
+		private string mVersion = null;
 
         public eCountry Country { get { return mCountry; } }
         public eLanguage Language { get { return mLanguage; } }
         public string LanguagePath { get { return mLanguagePath; } }
         public string DataPath { get { return mDataPath; } }
+		public string Version { get { return mVersion; }}
 
         public static GameMgr Instance
         {
             get { return MonoSingletonProperty<GameMgr>.Instance; }
         }
+
+		public override int ManagerId
+		{
+			get { return MgrEnumBase.Game; }
+		}
 
         public void OnSingletonInit() { }
 
@@ -54,11 +61,7 @@
             mLanguage = (eLanguage)param[1];
             mLanguagePath = GetLangPath(mLanguage);
             mDataPath = GetDataPath();
-        }
-
-        protected override void SetupMgrId()
-        {
-            mMgrId = MgrEnumBase.Game;
+			mVersion = (string)param[2];
         }
 
         //檔案檢查
@@ -96,34 +99,6 @@
             return Application.temporaryCachePath + "/";
 #else
             return Application.persistentDataPath + "/";
-#endif
-        }
-
-        //取得FTP路徑
-        private string GetFTPLocation(string vIP)
-        {
-#if UNITY_STANDALONE
-            return FTP_HEADER + vIP + "/Windows/";
-#elif UNITY_IOS
-            return FTP_HEADER + vIP + "/Ios/";
-#elif UNITY_TVOS
-            return FTP_HEADER + vIP + "/Tvos/";
-#elif UNITY_ANDROID
-            return FTP_HEADER + vIP + "/Android/";
-#endif
-        }
-
-        //取得HTTP路徑
-        private string GetHTTPLocation(string vIP, string vName)
-        {
-#if UNITY_STANDALONE
-            return HTTP_HEADER + vIP + "/" + vName + "/Windows/";
-#elif UNITY_IOS
-            return HTTP_HEADER + vIP + "/" + vName + "/Ios/";
-#elif UNITY_TVOS
-            return HTTP_HEADER + vIP + "/" + vName + "/Tvos/";
-#elif UNITY_ANDROID
-            return HTTP_HEADER + vIP + "/" + vName + "/Android/";
 #endif
         }
     }

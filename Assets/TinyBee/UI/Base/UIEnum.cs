@@ -1,4 +1,4 @@
-﻿namespace TinyBee.UI
+﻿namespace TinyBee.UI.Enum
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -59,14 +59,14 @@
     {
         protected static readonly Dictionary<int, TUIEnum> mTables = new Dictionary<int, TUIEnum>();
 
-        public static TUIEnum mNone = new TUIEnum(0, "None");
-        public static TUIEnum mRoot = new TUIEnum(1, "Root");
-        public static TUIEnum mLoading = new TUIEnum(2, "Loading");
-        public static TUIEnum mConnecting = new TUIEnum(3, "Connecting");
-        public static TUIEnum mBubble = new TUIEnum(4, "Bubble");
-        public static TUIEnum mMsg = new TUIEnum(5, "Msg");
-        public static TUIEnum mController = new TUIEnum(6, "Controller");
-        public static TUIEnum mTutorial = new TUIEnum(7, "Tutorial");
+        protected static TUIEnum mNone = new TUIEnum(0, "None");
+        protected static TUIEnum mRoot = new TUIEnum(1, "Root");
+        protected static TUIEnum mLoading = new TUIEnum(2, "Loading");
+        protected static TUIEnum mConnecting = new TUIEnum(3, "Connecting");
+        protected static TUIEnum mBubble = new TUIEnum(4, "Bubble");
+        protected static TUIEnum mMsg = new TUIEnum(5, "Msg");
+        protected static TUIEnum mController = new TUIEnum(6, "Controller");
+        protected static TUIEnum mTutorial = new TUIEnum(7, "Tutorial");
 
         public static int None { get { return mNone.value; } }
         public static int Root { get { return mRoot.value; } }
