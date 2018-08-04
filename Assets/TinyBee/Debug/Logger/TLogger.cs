@@ -23,7 +23,9 @@
 #if UNITY_EDITOR
             Debug.Log(message);
 #endif
+#if _DEBUG
             DebugMgr.Instance.Log(message);
+#endif
         }
 
         public void LogWarning(string message)
@@ -31,7 +33,9 @@
 #if UNITY_EDITOR
             Debug.LogWarning(message);
 #endif
-            DebugMgr.Instance.LogWarning(message);
+#if _DEBUG
+			DebugMgr.Instance.LogWarning(message);
+#endif
         }
 
         public void LogError(string message)
@@ -39,7 +43,9 @@
 #if UNITY_EDITOR
             Debug.LogError(message);
 #endif
-            DebugMgr.Instance.LogError(message);
+#if _DEBUG
+			DebugMgr.Instance.LogError(message);
+#endif
         }
 
         public void LogException(Exception exception)
@@ -54,7 +60,9 @@
 #if UNITY_EDITOR
                 Debug.LogWarning(message);
 #endif
-                DebugMgr.Instance.LogWarning(message);
+#if _DEBUG
+				DebugMgr.Instance.LogWarning(message);
+#endif
             }
         }
 
