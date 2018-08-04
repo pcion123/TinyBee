@@ -7,6 +7,7 @@
     using UnityEngine;
     using ICSharpCode.SharpZipLib.Zip;
     using ICSharpCode.SharpZipLib.Core;
+	using TinyContext = TinyBee.Context.TinyContext;
     using ILogger = TinyBee.Logger.ILogger;
     using TLogger = TinyBee.Logger.TLogger;
 
@@ -39,7 +40,7 @@
                 if (bundle.isDone == true)
                 {
                     //設置存檔路徑
-                    string sPath = GameMgr.Instance.DataPath + data.Path;
+					string sPath = TinyContext.Instance.DataPath + data.Path;
                     string sName = data.FileName;
                     TFile.Save(sPath, sName, bundle.bytes);
                 }
@@ -78,7 +79,7 @@
                 if (bundle.isDone == true)
                 {
                     //設置存檔路徑
-                    string sPath = GameMgr.Instance.DataPath + data.Path;
+					string sPath = TinyContext.Instance.DataPath + data.Path;
                     string sName = data.FileName;
                     TFile.Save(sPath, sName, bundle.bytes);
 
@@ -91,7 +92,7 @@
                             // 逐一取出壓縮檔內的檔案(解壓縮)
 							while ((zipEntry = zipInputStream.GetNextEntry()) != null)
                             {
-								string zPath = GameMgr.Instance.DataPath + data.Path + zipEntry.Name;
+								string zPath = TinyContext.Instance.DataPath + data.Path + zipEntry.Name;
 
                                 //檢查是否存在舊檔案
                                 if (File.Exists(zPath) == true)

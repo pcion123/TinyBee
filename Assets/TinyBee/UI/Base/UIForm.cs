@@ -2,6 +2,7 @@
 {
     using UnityEngine;
     using System.Collections;
+	using TinyContext = TinyBee.Context.TinyContext;
     using ILogger = Logger.ILogger;
     using TLogger = Logger.TLogger;
 
@@ -116,21 +117,6 @@
             return string.Format("{0}  Hidden={1}  Min={2}  Max={3}  Offset={4}", mUIName, !gameObject.activeSelf, mMinDepth, mMaxDepth, mOffsetDepth);
         }
 
-        void OnDestroy()
-        {
-
-        }
-
-        private bool CheckNeedBlur()
-        {
-            return false;
-        }
-
-        private bool CheckNeedMask()
-        {
-            return false;
-        }
-
 		public virtual int SortUI(int depth)
         {
 #if _BLUR
@@ -195,7 +181,7 @@
         }
 
         //初始化
-        public void Init(UIMgr mgr, int ui, string uiname, Transform parent, int vParam, int depth, int rank)
+        public void Init(UIMgr mgr, int ui, string uiname, Transform parent, int param, int depth, int rank)
         {
 			mMgr = mgr;
 			mUI = ui;
@@ -203,7 +189,7 @@
 			mMinDepth = depth;
 			mMaxDepth = depth;
 			mOffsetDepth = depth;
-            mParam = vParam;
+			mParam = param;
 			mRank = rank;
 #if _MASK
 			mMask = null;
@@ -285,7 +271,7 @@
 		protected IEnumerator IBuildMask()
 		{
 			TObject obj = new TObject();
-			string path = Application.streamingAssetsPath + "/" + GameMgr.Instance.LanguagePath + "/Main/Common/UIs/Panels/";
+			string path = Application.streamingAssetsPath + "/" + TinyContext.Instance.LanguagePath + "/Main/Common/UIs/Panels/";
 			AssetBundle bundle = mMgr.GetStandardAtlas("Panel_Mask-Atlas");
 			if (bundle == null)
 			{
@@ -296,8 +282,8 @@
 				}
 				else
 				{
-					GameObject vMask = obj.Bundle.assetBundle.mainAsset as GameObject;
-					UIAtlas vAtlas = vMask.GetComponent<UIAtlas>();
+					GameObject mask = obj.Bundle.assetBundle.mainAsset as GameObject;
+					UIAtlas atlas = mask.GetComponent<UIAtlas>();
 					mMgr.PushStandardAtlas("Panel_Mask-Atlas", obj.Bundle.assetBundle);
 				}
 			}

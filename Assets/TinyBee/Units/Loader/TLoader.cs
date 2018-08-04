@@ -1,11 +1,12 @@
-﻿namespace TinyBee
+﻿namespace TinyBee.Data
 {
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.IO;
 	using System;
+	using Data;
 
-	public abstract class TLoader<T> : IDisposable
+	public abstract class TLoader<T> : IDisposable where T : IData
 	{
 		//資料庫
 		protected List<T> mDataList = null;
@@ -21,14 +22,14 @@
 		public void LoadJson(byte[] byteArray)
 		{
 			byteArray = TFile.XOR(byteArray);
-			using (MemoryStream vStream = new MemoryStream(byteArray))
+			using (MemoryStream stream = new MemoryStream(byteArray))
 			{
-				using (StreamReader vReader = new StreamReader(vStream, System.Text.UTF8Encoding.UTF8))
+				using (StreamReader reader = new StreamReader(stream, System.Text.UTF8Encoding.UTF8))
 				{
-					string vStr = vReader.ReadToEnd();
-					if (vStr.Trim() == "[]")
+					string str = reader.ReadToEnd();
+					if (str.Trim() == "[]")
 						return;
-					LoadJson(vStr);
+					LoadJson(str);
 				}
 			}
 			Analyze();

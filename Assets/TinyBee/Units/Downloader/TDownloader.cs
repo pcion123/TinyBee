@@ -7,6 +7,7 @@
     using UnityEngine;
     using ICSharpCode.SharpZipLib.Zip;
     using ICSharpCode.SharpZipLib.Core;
+	using TinyContext = TinyBee.Context.TinyContext;
     using ILogger = TinyBee.Logger.ILogger;
     using TLogger = TinyBee.Logger.TLogger;
 
@@ -58,9 +59,9 @@
 		private void LoadVersion (string versionName)
 		{
 #if UNITY_TVOS && !UNITY_EDITOR
-			string path = Application.temporaryCachePath + "/" + GameMgr.Instance.LanguagePath + "/" + "Versions/";
+			string path = Application.temporaryCachePath + "/" + TinyContext.Instance.LanguagePath + "/" + "Versions/";
 #else
-			string path = Application.persistentDataPath + "/" + GameMgr.Instance.LanguagePath + "/" + "Versions/";
+			string path = Application.persistentDataPath + "/" + TinyContext.Instance.LanguagePath + "/" + "Versions/";
 #endif
 			byte[] datas = TFile.Load(path, versionName);
 
@@ -87,9 +88,9 @@
 		private void SaveVersion(string versionName)
 		{
 #if UNITY_TVOS && !UNITY_EDITOR
-			string path = Application.temporaryCachePath + "/" + GameMgr.Instance.LanguagePath + "/" + "Versions/";
+			string path = Application.temporaryCachePath + "/" + TinyContext.Instance.LanguagePath + "/" + "Versions/";
 #else
-			string path = Application.persistentDataPath + "/" + GameMgr.Instance.LanguagePath + "/" + "Versions/";
+			string path = Application.persistentDataPath + "/" + TinyContext.Instance.LanguagePath + "/" + "Versions/";
 #endif
 			if (mRecordMap.Count > 0)
 			{
@@ -267,7 +268,7 @@
 
 		private bool CheckNeedUpdate(rRes data)
 		{
-			string path = GameMgr.Instance.DataPath + data.Path + data.FileName;
+			string path = TinyContext.Instance.DataPath + data.Path + data.FileName;
 
 #if UNITY_TVOS && !UNITY_EDITOR
 			//檢查檔案是否存在
@@ -321,7 +322,7 @@
 
         protected IEnumerator IGetDownloadList(string ip, string hostName, string versionName, string version)
         {
-			string path = GetLocation(ip, hostName) + GameMgr.Instance.LanguagePath + "/" + "Versions/";
+			string path = GetLocation(ip, hostName) + TinyContext.Instance.LanguagePath + "/" + "Versions/";
             string name = versionName;
 
             mStatus = eStatus.Updating;

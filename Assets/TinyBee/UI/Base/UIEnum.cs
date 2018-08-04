@@ -20,6 +20,11 @@
             return name;
         }
 
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+
         public override bool Equals(object obj)
         {
             TUIEnum tmp = obj as TUIEnum;

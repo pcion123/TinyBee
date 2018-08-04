@@ -39,6 +39,11 @@
             return string.Format("UI={0}   Name={1}   Type={2}   Param={3}   Depth={4}   Rank={5}", UIEnumBase.GetEnumName(ui), name, type.ToString(), param, depth, rank);
         }
 
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+
         public override bool Equals(object obj)
         {
             TUIInfo tmp = obj as TUIInfo;

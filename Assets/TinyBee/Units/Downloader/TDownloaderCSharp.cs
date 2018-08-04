@@ -7,6 +7,7 @@
     using UnityEngine;
     using ICSharpCode.SharpZipLib.Zip;
     using ICSharpCode.SharpZipLib.Core;
+	using TinyContext = TinyBee.Context.TinyContext;
     using ILogger = TinyBee.Logger.ILogger;
     using TLogger = TinyBee.Logger.TLogger;
 
@@ -22,7 +23,7 @@
 
             //設置下載路徑
             string dPath = GetLocation(ip, hostName) + data.Path + data.FileName;
-            string sPath = GameMgr.Instance.DataPath + data.Path + data.FileName;
+			string sPath = TinyContext.Instance.DataPath + data.Path + data.FileName;
 
             //TODO:下載動作
             yield return null;
@@ -49,7 +50,7 @@
 
             //設置下載路徑
             string dPath = GetLocation(ip, hostName) + data.Path + data.FileName;
-            string sPath = GameMgr.Instance.DataPath + data.Path + data.FileName;
+			string sPath = TinyContext.Instance.DataPath + data.Path + data.FileName;
 
             //TODO:下載動作
             yield return null;
@@ -67,7 +68,7 @@
                         // 逐一取出壓縮檔內的檔案(解壓縮)
 						while ((zipEntry = zipInputStream.GetNextEntry()) != null)
                         {
-							string zPath = GameMgr.Instance.DataPath + data.Path + zipEntry.Name;
+							string zPath = TinyContext.Instance.DataPath + data.Path + zipEntry.Name;
 
                             //檢查是否存在舊檔案
                             if (File.Exists(zPath) == true)
