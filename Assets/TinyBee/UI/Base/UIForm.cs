@@ -60,6 +60,7 @@
 #if _MASK
 		private GameObject mMask = null;              //
 #endif
+		protected TAudio mBGAudio = null;
 
 		public int UI { get { return mUI; } }
         public string UIName { get { return mUIName; } }
@@ -194,6 +195,7 @@
 #if _MASK
 			mMask = null;
 #endif
+			mBGAudio = null;
 
 			SetParent(parent);
         }
@@ -227,6 +229,12 @@
 #if _MASK
 			mMask = null;
 #endif
+			if (mBGAudio != null)
+			{
+				mBGAudio.Dispose();
+				mBGAudio = null;
+			}
+
             this.DestroyGameObjGracefully();
         }
 
@@ -307,6 +315,25 @@
 			obj.Free();
 		}
 #endif
+
+		protected IEnumerator IBuildMusic(string path, string fileName)
+		{
+			TObject obj = new TObject();
+			yield return CoroutineMgr.Instance.StartCoroutine(DataMgr.Instance.ILoadMP3(path, fileName, obj));
+			if (obj.Err != null)
+			{
+				mLogger.Log(obj.Err);
+			}
+			else
+			{
+				mBGAudio = AudioMgr.Instance.Add(gameObject, eAudio.MUSIC);
+				mBGAudio.clip = obj.Bundle.GetAudioClip(false, false, AudioType.MPEG);
+				mBGAudio.playOnAwake = false;
+				mBGAudio.loop = true;
+				mBGAudio.Play();
+			}
+			obj.Free();
+		}
 
         //搜尋子物件
 		protected GameObject FindChild(string path)

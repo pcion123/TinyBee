@@ -3,7 +3,8 @@
 	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
-    using Debug;
+	using TinyBee.Debug;
+	using TinyBee.Context;
 
 	[TMonoSingletonPath("[Debug]/DebugMgr")]
 	public class DebugMgr : TMgrBehaviour, ISingleton
@@ -77,7 +78,7 @@
                     GUILayout.Box(TFps.Instance.Fps.ToString("F2"), GetGUIStyle(mStyle, 1, TFps.Instance.Fps));
 
                     //顯示Ping值
-                    GUILayout.Box(NetMgr.Instance.RunPingTick.ToString() + " ms", GetGUIStyle(mStyle, 2, NetMgr.Instance.RunPingTick));
+					GUILayout.Box(NetMgr.Instance.Ping.ToString() + " ms", GetGUIStyle(mStyle, 2, TinyNet.Instance.Ping));
 
 					//繪製視窗選單按鈕
 					foreach (KeyValuePair<int, TWindow> window in mWindowTable)
