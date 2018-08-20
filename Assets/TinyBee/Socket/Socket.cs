@@ -29,7 +29,7 @@
 		private HeaderBase mProcessHeader;
 		private long mTimeup = -1L;
 
-		private NetProcess[,] mNetProcesses = new NetProcess[256,256];
+		private NetProcess[,] mNetProcesses = new NetProcess[128,128];
 
 		public RcvHeader OnGenRcvHeader { get; set; }
 		public SendHeader OnGenSendHeader { get; set; }
@@ -117,8 +117,8 @@
 						{
 							mProcessHeader = new HeaderBase();
 							mProcessHeader.Version = mProcessBuffer.ReadShort();
-							mProcessHeader.MainNo = mProcessBuffer.ReadByte();
-							mProcessHeader.SubNo = mProcessBuffer.ReadByte();
+							mProcessHeader.MainNo = mProcessBuffer.ReadSByte();
+							mProcessHeader.SubNo = mProcessBuffer.ReadSByte();
 							mProcessHeader.IsCompress = mProcessBuffer.ReadBool();
 							mProcessHeader.SessionId = mProcessBuffer.ReadLong();
 							mProcessHeader.Len = mProcessBuffer.ReadInt();
@@ -272,7 +272,7 @@
 			}
 		}
 
-		public virtual void Send(byte mainNo, byte subNo, ByteArrayBuffer msg)
+		public virtual void Send(sbyte mainNo, sbyte subNo, ByteArrayBuffer msg)
 		{
 			if (!Connected)
 				return;
@@ -293,8 +293,8 @@
 					{
 						header = new ByteArrayBuffer();
 						header.WriteShort(mVersion);
-						header.WriteByte(mainNo);
-						header.WriteByte(subNo);
+						header.WriteSByte(mainNo);
+						header.WriteSByte(subNo);
 						header.WriteBool(mPackCompressSize > 0 && mPackCompressSize < msg.Available);
 						header.WriteLong(mSessionId);
 						header.WriteInt(msg.Available);

@@ -1,5 +1,7 @@
 ﻿namespace TinyBee.Net.Buffer
 {
+	using System.Collections;
+	using System.Collections.Generic;
 	using System;
 	using System.Reflection;
 	using System.Runtime.InteropServices;
@@ -16,24 +18,25 @@
 		public ByteArrayBuffer() : base(BUFFERSIZE) {}
 		public ByteArrayBuffer(byte[] buf) : base(buf, 0, buf.Length) {}
 
-		private void WriteToEndian(byte[] data)
+		private void WriteToEndian(byte[] value)
 		{
 			if ((BitConverter.IsLittleEndian && BIGENDIAN) || (!BitConverter.IsLittleEndian && !BIGENDIAN))
-				Array.Reverse(data);
-			Write(data);
+				Array.Reverse(value);
+			Write(value);
 		}
 
-		private void ReadToEndian(byte[] data)
+		private void ReadToEndian(byte[] value)
 		{
-			Read(data);
+			Read(value);
 			if ((BitConverter.IsLittleEndian && BIGENDIAN) || (!BitConverter.IsLittleEndian && !BIGENDIAN))
-				Array.Reverse(data);
+				Array.Reverse(value);
 		}
 
-		public void WriteByteArray(byte[] data)
+		public ByteArrayBuffer WriteByteArray(byte[] value)
 		{
-			WriteInt(data.Length);
-			WriteToEndian(data);
+			WriteInt(value.Length);
+			WriteToEndian(value);
+			return this;
 		}
 
 		public byte[] ReadByteArray()
@@ -44,25 +47,12 @@
 			return tmp;
 		}
 
-		public void WriteByte(byte data)
+		public ByteArrayBuffer WriteSByte(sbyte value)
 		{
 			byte[] tmp = new byte[1];
-			tmp[0] = data;
+			tmp[0] = (byte)value;
 			WriteToEndian(tmp);
-		}
-
-		public byte ReadByte()
-		{
-			byte[] tmp = new byte[1];
-			ReadToEndian(tmp);
-			return tmp[0];
-		}
-
-		public void WriteSByte(sbyte data)
-		{
-			byte[] tmp = new byte[1];
-			tmp[0] = (byte)data;
-			WriteToEndian(tmp);
+			return this;
 		}
 
 		public sbyte ReadSByte()
@@ -72,277 +62,182 @@
 			return (sbyte)tmp[0];
 		}
 
-		public void WriteShort(short data)
+		public ByteArrayBuffer WriteShort(short value)
 		{
-			byte[] tmp = BitConverter.GetBytes(data);
+			byte[] tmp = BitConverter.GetBytes(value);
 			WriteToEndian(tmp);
+			return this;
 		}
 
 		public short ReadShort()
 		{
-			short data = 0;
-			byte[] tmp = BitConverter.GetBytes(data);
+			short value = 0;
+			byte[] tmp = BitConverter.GetBytes(value);
 			ReadToEndian(tmp);
 			return BitConverter.ToInt16(tmp, 0);
 		}
 
-		public void WriteUShort(ushort data)
+		public ByteArrayBuffer WriteInt(int value)
 		{
-			byte[] tmp = BitConverter.GetBytes(data);
+			byte[] tmp = BitConverter.GetBytes(value);
 			WriteToEndian(tmp);
-		}
-
-		public ushort ReadUShort()
-		{
-			ushort data = 0;
-			byte[] tmp = BitConverter.GetBytes(data);
-			ReadToEndian(tmp);
-			return BitConverter.ToUInt16(tmp, 0);
-		}
-
-		public void WriteInt(int data)
-		{
-			byte[] tmp = BitConverter.GetBytes(data);
-			WriteToEndian(tmp);
+			return this;
 		}
 
 		public int ReadInt()
 		{
-			int data = 0;
-			byte[] tmp = BitConverter.GetBytes(data);
+			int value = 0;
+			byte[] tmp = BitConverter.GetBytes(value);
 			ReadToEndian(tmp);
 			return BitConverter.ToInt32(tmp, 0);            
 		}
 
-		public void WriteUInt(uint data)
+		public ByteArrayBuffer WriteLong(long value)
 		{
-			byte[] tmp = BitConverter.GetBytes(data);
+			byte[] tmp = BitConverter.GetBytes(value);
 			WriteToEndian(tmp);
-		}
-
-		public uint ReadUInt()
-		{
-			uint data = 0;
-			byte[] tmp = BitConverter.GetBytes(data);
-			ReadToEndian(tmp);
-			return BitConverter.ToUInt32(tmp, 0);  
-		}
-
-		public void WriteLong(long data)
-		{
-			byte[] tmp = BitConverter.GetBytes(data);
-			WriteToEndian(tmp);
+			return this;
 		}
 
 		public long ReadLong()
 		{
-			long data = 0;
-			byte[] tmp = BitConverter.GetBytes(data);
+			long value = 0;
+			byte[] tmp = BitConverter.GetBytes(value);
 			ReadToEndian(tmp);
 			return BitConverter.ToInt64(tmp, 0);  
 		}
 
-		public void WriteULong(ulong data)
+		public ByteArrayBuffer WriteFloat(float value)
 		{
-			byte[] tmp = BitConverter.GetBytes(data);
+			byte[] tmp = BitConverter.GetBytes(value);
 			WriteToEndian(tmp);
-		}
-
-		public ulong ReadULong()
-		{
-			ulong data = 0;
-			byte[] tmp = BitConverter.GetBytes(data);
-			ReadToEndian(tmp);
-			return BitConverter.ToUInt64(tmp, 0);  
-		}
-
-		public void WriteFloat(float data)
-		{
-			byte[] tmp = BitConverter.GetBytes(data);
-			WriteToEndian(tmp);
+			return this;
 		}
 
 		public float ReadFloat()
 		{
-			float data = 0;
-			byte[] tmp = BitConverter.GetBytes(data);
+			float value = 0;
+			byte[] tmp = BitConverter.GetBytes(value);
 			ReadToEndian(tmp);
 			return BitConverter.ToSingle(tmp, 0);  
 		}
 
-		public void WriteDouble(double data)
+		public ByteArrayBuffer WriteDouble(double data)
 		{
 			byte[] tmp = BitConverter.GetBytes(data);
 			WriteToEndian(tmp);
+			return this;
 		}
 
 		public double ReadDouble()
 		{
-			double data = 0;
-			byte[] tmp = BitConverter.GetBytes(data);
+			double value = 0;
+			byte[] tmp = BitConverter.GetBytes(value);
 			ReadToEndian(tmp);
 			return BitConverter.ToDouble(tmp, 0); 
 		}
 
-		public void WriteChar(char data)
+		public ByteArrayBuffer WriteChar(char value)
 		{
-			byte[] tmp = BitConverter.GetBytes(data);
+			byte[] tmp = BitConverter.GetBytes(value);
 			WriteToEndian(tmp);
+			return this;
 		}
 
 		public char ReadChar()
 		{
-			char data = '0';
-			byte[] tmp = BitConverter.GetBytes(data);
+			char value = '0';
+			byte[] tmp = BitConverter.GetBytes(value);
 			ReadToEndian(tmp);
 			return BitConverter.ToChar(tmp, 0); 
 		}
 
-		public void WriteBool(bool data)
+		public ByteArrayBuffer WriteBool(bool value)
 		{
-			byte[] tmp = BitConverter.GetBytes(data);
+			byte[] tmp = BitConverter.GetBytes(value);
 			WriteToEndian(tmp);
+			return this;
 		}
 
 		public bool ReadBool()
 		{
-			bool data = false;
-			byte[] tmp = BitConverter.GetBytes(data);
+			bool value = false;
+			byte[] tmp = BitConverter.GetBytes(value);
 			ReadToEndian(tmp);
 			return BitConverter.ToBoolean(tmp, 0); 
 		}
 
-		public void WriteStringByByte(string data)
+		public ByteArrayBuffer WriteString(string value)
 		{
-			byte[] tmp = System.Text.Encoding.UTF8.GetBytes(data);
-			WriteByte((byte)tmp.Length);
-			WriteToEndian(tmp);
+			byte[] tmp = System.Text.Encoding.UTF8.GetBytes(value);
+			return WriteByteArray(tmp);
 		}
 
-		public string ReadStringByByte()
+		public string ReadString()
 		{
-			byte len = ReadByte();
-			byte[] tmp = new byte[len];
-			ReadToEndian(tmp);
+			byte[] tmp = ReadByteArray();
 			return System.Text.Encoding.UTF8.GetString(tmp);
 		}
 
-		public void WriteStringByUShort(string data)
+		private MemberAttribute getMember(FieldInfo field)
 		{
-			byte[] tmp = System.Text.Encoding.UTF8.GetBytes(data);
-			WriteUShort((ushort)tmp.Length);
-			WriteToEndian(tmp);
-		}
-
-		public string ReadStringByUShort()
-		{
-			ushort len = ReadUShort();
-			byte[] tmp = new byte[len];
-			ReadToEndian(tmp);
-			return System.Text.Encoding.UTF8.GetString(tmp);
-		}
-
-		public void WriteStringByInt(string data)
-		{
-			byte[] tmp = System.Text.Encoding.UTF8.GetBytes(data);
-			WriteInt(tmp.Length);
-			WriteToEndian(tmp);
-		}
-
-		public string ReadStringByInt()
-		{
-			int len = ReadInt();
-			byte[] tmp = new byte[len];
-			ReadToEndian(tmp);
-			return System.Text.Encoding.UTF8.GetString(tmp);
-		}
-
-		public void WriteDateTime(DateTime data)
-		{
-			//要知道這行為什麼是這個數值要先知道幾件事
-			//Delphi中TDateTime初始時間為1899/12/30 00:00:00
-			//C#中DateTime的初始值為0001/01/01 00:00:00
-			//DateTime是初始日期(Ticks=0) + offset而成
-			const double DAYS_BETWEEN_00010101_AND_18991230 = 693593;
-			//24 * 60 * 60 * 1000 * 1000 * 10
-			const double TIME_UNIT = 864000000000;
-			//C# DateTime 為 delphi中所存的日期 + C#與Delphi日期格式初始值的差異
-			double doubleTime = data.Ticks / TIME_UNIT - DAYS_BETWEEN_00010101_AND_18991230;
-			WriteDouble(doubleTime);
-		}
-
-		public DateTime ReadDateTime()
-		{
-			double doubleTime = ReadDouble();
-			//要知道這行為什麼是這個數值要先知道幾件事
-			//Delphi中TDateTime初始時間為1899/12/30 00:00:00
-			//C#中DateTime的初始值為0001/01/01 00:00:00
-			//DateTime是初始日期(Ticks=0) + offset而成
-			const double DAYS_BETWEEN_00010101_AND_18991230 = 693593;
-			//24 * 60 * 60 * 1000 * 1000 * 10
-			const double TIME_UNIT = 864000000000;
-			//C# DateTime 為 delphi中所存的日期 + C#與Delphi日期格式初始值的差異
-			return new DateTime((long)((doubleTime + DAYS_BETWEEN_00010101_AND_18991230) * TIME_UNIT));
-		}
-
-		private void WriteValue(object value)
-		{
-			System.IConvertible convertible = value as System.IConvertible;
-			if (convertible != null)
+			if (field != null)
 			{
-				switch (convertible.GetTypeCode())
+				object[] atts = field.GetCustomAttributes(false);
+				foreach (MemberAttribute member in atts)
+					return member;
+			}
+			return null;
+		}
+
+		private FieldInfo[] sortMember(FieldInfo[] fields)
+		{
+			List<FieldInfo> list = new List<FieldInfo>();
+			foreach (FieldInfo field in fields)
+			{
+				MemberAttribute member = getMember(field);
+				if (member != null)
 				{
-					case System.TypeCode.Boolean:
-						WriteBool((bool)value);
-						return;
-					case System.TypeCode.Char:
-						WriteChar((char)value);
-						return;
-					case System.TypeCode.SByte:
-						WriteSByte((sbyte)value);
-						return;
-					case System.TypeCode.Byte:
-						WriteByte((byte)value);
-						return;
-					case System.TypeCode.Int16:
-						WriteShort((short)value);
-						return;
-					case System.TypeCode.UInt16:
-						WriteUShort((ushort)value);
-						return;
-					case System.TypeCode.Int32:
-						WriteInt((int)value);
-						return;
-					case System.TypeCode.UInt32:
-						WriteUInt((uint)value);
-						return;
-					case System.TypeCode.Int64:
-						WriteLong((long)value);
-						return;
-					case System.TypeCode.UInt64:
-						WriteULong((ulong)value);
-						return;
-					case System.TypeCode.Single:
-						WriteFloat((float)value);
-						return;
-					case System.TypeCode.Double:
-						WriteDouble((double)value);
-						return;
-					case System.TypeCode.DateTime:
-						WriteDouble(((DateTime)value).ToOADate());
-						return;
-					case System.TypeCode.String:
-						return;
+					if (list.Count < member.Order)
+					{
+						list.Add(field);
+					}
+					else
+					{
+						list.Insert(member.Order - 1, field);
+					}
 				}
 			}
+			return list.ToArray();
+		}
 
-			FieldInfo[] f = value.GetType().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
-			System.Array.Sort(f, (FieldInfo a, FieldInfo b) => { return a.MetadataToken - b.MetadataToken; });
-			for (int i = 0; i < f.Length; i++)
+		private ByteArrayBuffer WriteValue(object value)
+		{
+			Type type = value.GetType();
+			if (type == Type.GetType("System.Boolean"))
+				return WriteBool((bool)value);
+			else if (type == Type.GetType("System.Char"))
+				return WriteChar((char)value);
+			else if (type == Type.GetType("System.SByte"))
+				return WriteSByte((sbyte)value);
+			else if (type == Type.GetType("System.Int16"))
+				return WriteShort((short)value);
+			else if (type == Type.GetType("System.Int32"))
+				return WriteInt((int)value);
+			else if (type == Type.GetType("System.Int64"))
+				return WriteLong((long)value);
+			else if (type == Type.GetType("System.Single"))
+				return WriteFloat((float)value);
+			else if (type == Type.GetType("System.Double"))
+				return WriteDouble((double)value);
+			else if (type == Type.GetType("System.String"))
+				return WriteString((string)value);
+			FieldInfo[] feilds = sortMember(value.GetType().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance));
+			for (int i = 0; i < feilds.Length; i++)
 			{
-				if (f[i].FieldType.IsArray)
+				if (feilds[i].FieldType.IsArray)
 				{
-					Array array = (Array)f[i].GetValue(value);
+					Array array = (Array)feilds[i].GetValue(value);
 					if (array != null)
 					{
 						for (int j = 0; j < array.Length; j++)
@@ -351,140 +246,97 @@
 						}
 					}
 				}
-				else if (!f[i].IsLiteral)
+				else if (!feilds[i].IsLiteral)
 				{
-					WriteValue(f[i].GetValue(value));
+					WriteValue(feilds[i].GetValue(value));
 				}
 			}
+			return this;
 		}
 
-		private void ReadValue(ref object value)
+		private object ReadValue(Type type)
 		{
-			System.IConvertible convertible = value as System.IConvertible;
-			if (convertible != null)
+			if (type == Type.GetType("System.Boolean"))
+				return ReadBool();
+			else if (type == Type.GetType("System.Char"))
+				return ReadChar();
+			else if (type == Type.GetType("System.SByte"))
+				return ReadSByte();
+			else if (type == Type.GetType("System.Int16"))
+				return ReadShort();
+			else if (type == Type.GetType("System.Int32"))
+				return ReadInt();
+			else if (type == Type.GetType("System.Int64"))
+				return ReadLong();
+			else if (type == Type.GetType("System.Single"))
+				return ReadFloat();
+			else if (type == Type.GetType("System.Double"))
+				return ReadDouble();
+			else if (type == Type.GetType("System.String"))
+				return ReadString();
+			object value = Activator.CreateInstance(type);
+			FieldInfo[] feilds = sortMember(value.GetType().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance));
+			for (int i = 0; i < feilds.Length; i++)
 			{
-				switch (convertible.GetTypeCode())
+				Type fieldType = feilds[i].FieldType;
+				if (feilds[i].FieldType.IsArray)
 				{
-					case System.TypeCode.Boolean:
-						value = ReadBool();
-						return;
-					case System.TypeCode.Char:
-						value = ReadChar();
-						return;
-					case System.TypeCode.SByte:
-						value = ReadSByte();
-						return;
-					case System.TypeCode.Byte:
-						value = ReadByte();
-						return;
-					case System.TypeCode.Int16:
-						value = ReadShort();
-						return;
-					case System.TypeCode.UInt16:
-						value = ReadUShort();
-						return;
-					case System.TypeCode.Int32:
-						value = ReadInt();
-						return;
-					case System.TypeCode.UInt32:
-						value = ReadUInt();
-						return;
-					case System.TypeCode.Int64:
-						value = ReadLong();
-						return;
-					case System.TypeCode.UInt64:
-						value = ReadULong();
-						return;
-					case System.TypeCode.Single:
-						value = ReadFloat();
-						return;
-					case System.TypeCode.Double:
-						value = ReadDouble();
-						return;
-					case System.TypeCode.DateTime:
-						value = DateTime.FromOADate(ReadDouble());
-						return;
-					case System.TypeCode.String:
-						return;
-				}
-			}
-
-			FieldInfo[] f = value.GetType().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
-			System.Array.Sort(f, (FieldInfo a, FieldInfo b) => { return a.MetadataToken - b.MetadataToken; });
-			for (int i = 0; i < f.Length; i++)
-			{
-				if (f[i].FieldType.IsArray == true)
-				{
-					Array array = (Array)f[i].GetValue(value);
-					if (array == null)
+					MemberAttribute member = getMember(feilds[i]);
+					if (member != null)
 					{
-						foreach (FieldAttribute attf in f[i].GetCustomAttributes(false))
-						{
-							int size = attf.Length;
-							array = System.Array.CreateInstance(f[i].FieldType.GetElementType(), size);
-							f[i].SetValue(value, array);
-							break;
-						}
-					}
-
-					if (array != null)
-					{
+						int len = member.Length;
+						Type arrayType = feilds[i].FieldType.GetElementType();
+						Array array = Array.CreateInstance(arrayType, len);
+						feilds[i].SetValue(value, array);
 						for (int j = 0; j < array.Length; j++)
 						{
-							object temp = array.GetValue(j);
-							ReadValue(ref temp);
-							array.SetValue(temp, j);
+							array.SetValue(ReadValue(arrayType), j);
 						}
 					}
 				}
-				else if (!f[i].IsLiteral)
+				else if (!feilds[i].IsLiteral)
 				{
-					object temp = f[i].GetValue(value);
-					if (temp == null)
-						temp = Activator.CreateInstance(temp.GetType());
-
-					ReadValue(ref temp);
-
-					f[i].SetValue(value, temp);
+					feilds[i].SetValue(value, ReadValue(fieldType));
 				}
 			}
+			return value;
 		}
 
-		public void WriteStruct<T>(T value)
+		public ByteArrayBuffer WriteStruct<T>(T value)
 		{
 			try
 			{
-				WriteValue(value);
+				return WriteValue(value);
 			}
 			catch (Exception e)
 			{
 				mLogger.LogException(e);
 			}
+			return this;
 		}
 
-		public void ReadStruct<T>(ref T value)
+		public T ReadStruct<T>()
 		{
 			try
 			{
-				object temp = value;
-				ReadValue(ref temp);
-				value = (T)temp;
+				return (T)ReadValue(typeof(T));
 			}
 			catch (Exception e)
 			{
 				mLogger.LogException(e);
 			}
+			return default(T);
 		}
 
 		public void WriteBufToJson<T>(T data)
 		{
 			string json = TJson.SerializeObject(data);
-			WriteStringByInt(json);
+			WriteString(json);
 		}
 
-		public void ReadBufToJSON<T>(ref T value)
+		public void ReadBufToJson<T>(ref T value)
 		{
-			string json = ReadStringByInt();
+			string json = ReadString();
 			try
 			{
 				value = TJson.DeserializeObject<T>(json);
