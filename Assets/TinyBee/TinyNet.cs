@@ -19,12 +19,10 @@
 			}
 		}
 
-		public int Ping
-		{
-			get
-			{
-				return mInstance != null ? mInstance.Ping : 0;
-			}
-		}
+		public int Version { get {  return mInstance != null ? mInstance.Version : 0; } }
+		public string Hostname { get {  return mInstance != null ? mInstance.Hostname : null; } }
+		public int Port { get {  return mInstance != null ? mInstance.Port : 0; } }
+		public bool Connected { get {  return mInstance != null ? mInstance.Connected : false; } }
+		public int Ping { get {  return mInstance != null ? mInstance.Ping : 0; } }
 	}
 }

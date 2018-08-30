@@ -34,16 +34,27 @@
 
 		public ByteArrayBuffer WriteByteArray(byte[] value)
 		{
-			WriteInt(value.Length);
-			WriteToEndian(value);
+			if (value == null)
+			{
+				WriteInt(0);
+			}
+			else
+			{
+				WriteInt(value.Length);
+				Write(value);
+			}
 			return this;
 		}
 
 		public byte[] ReadByteArray()
 		{
 			int len = ReadInt();
-			byte[] tmp = new byte[len];
-			ReadToEndian(tmp);
+			byte[] tmp = null;
+			if (len > 0)
+			{
+				tmp = new byte[len];
+				Read(tmp);
+			}
 			return tmp;
 		}
 
@@ -169,14 +180,31 @@
 
 		public ByteArrayBuffer WriteString(string value)
 		{
-			byte[] tmp = System.Text.Encoding.UTF8.GetBytes(value);
-			return WriteByteArray(tmp);
+			if (value == null)
+			{
+				return WriteByteArray(null);
+			}
+			else
+			{
+				byte[] tmp = System.Text.Encoding.UTF8.GetBytes(value);
+				return WriteByteArray(tmp);
+			}
 		}
 
 		public string ReadString()
 		{
 			byte[] tmp = ReadByteArray();
-			return System.Text.Encoding.UTF8.GetString(tmp);
+			return tmp != null ? System.Text.Encoding.UTF8.GetString(tmp) : null;
+		}
+
+		public ByteArrayBuffer WriteDateTime(DateTime value)
+		{
+			return WriteLong(value.AddHours(-8).Ticks - TTime.TICK1970);
+		}
+
+		public DateTime ReadDateTime()
+		{
+			return new DateTime(ReadLong() * 10000 + TTime.TICK1970).AddHours(8);
 		}
 
 		private MemberAttribute getMember(FieldInfo field)
@@ -232,6 +260,8 @@
 				return WriteDouble((double)value);
 			else if (type == Type.GetType("System.String"))
 				return WriteString((string)value);
+			else if (type == Type.GetType("System.DateTime"))
+				return WriteDateTime((DateTime)value);
 			FieldInfo[] feilds = sortMember(value.GetType().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance));
 			for (int i = 0; i < feilds.Length; i++)
 			{
@@ -274,6 +304,8 @@
 				return ReadDouble();
 			else if (type == Type.GetType("System.String"))
 				return ReadString();
+			else if (type == Type.GetType("System.DateTime"))
+				return ReadDateTime();
 			object value = Activator.CreateInstance(type);
 			FieldInfo[] feilds = sortMember(value.GetType().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance));
 			for (int i = 0; i < feilds.Length; i++)

@@ -4,18 +4,14 @@
 
 	public class Record
 	{
-		public bool IsWaitting { get; set; }
-		public byte MainNo { get; set; }
-		public byte SubNo { get; set; }
-		public byte SerialId { get; set; }
+		public bool Waitting { get; set; }
+		public sbyte SerialId { get; set; }
 		public ByteArrayBuffer Msg { get; set; }
 
 		//建構子
 		public Record()
 		{
-			IsWaitting = false;
-			MainNo = 0;
-			SubNo = 0;
+			Waitting = false;
 			SerialId = 0;
 			Msg = new ByteArrayBuffer();
 		}
@@ -23,11 +19,11 @@
 		//清除內容
 		public void Clear()
 		{
-			IsWaitting = false;
-			MainNo = 0;
-			SubNo = 0;
+			Waitting = false;
 			SerialId = 0;
-			Msg.Clear();
+
+			if (Msg != null)
+				Msg.Clear();
 		}
 	}
 }

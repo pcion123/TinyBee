@@ -8,6 +8,8 @@
 		public const long ONEHOURTICK = 60 * ONEMINUTETICK;
 		public const long ONEDAYTICK = 24 * ONEHOURTICK;
 
+		public const long TICK1970 = 621355968000000000L;
+
 		public static long Current { get { return System.DateTime.Now.Ticks; } }
 	}
 }

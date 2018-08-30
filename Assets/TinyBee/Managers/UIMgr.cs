@@ -544,7 +544,7 @@
         {
 			UIForm form = GetUI(UIEnumBase.Connecting);
 			if (form != null)
-				form.Open();
+				form.Open(new object[] {msg, showPanel, showButton});
         }
 
         public void HideNet()

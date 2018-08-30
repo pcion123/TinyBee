@@ -200,12 +200,12 @@
 			SetParent(parent);
         }
 
-        public virtual void Open()
+		public virtual void Open(params object[] param)
         {
 			//TODO:子類別實作
         }
 
-        public virtual void Close()
+		public virtual void Close(params object[] param)
         {
 			//TODO:子類別實作
         }

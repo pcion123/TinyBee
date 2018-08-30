@@ -2,8 +2,10 @@
 {
 	public interface INet
 	{
-		//int Status { get; }
-		//bool IsPinging { get; }
+		int Version { get; }
+		string Hostname { get; }
+		int Port { get; }
+		bool Connected { get; }
 		int Ping { get; }
 	}
 }

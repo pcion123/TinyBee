@@ -9,6 +9,20 @@
 
 	public class Socket : IDisposable
 	{
+		protected class NetChecker
+		{
+			public int MainNo;
+			public int SubNo;
+			public Record Record;
+
+			public NetChecker(int mainNo, int subNo)
+			{
+				MainNo = mainNo;
+				SubNo = subNo;
+				Record = new Record();
+			}
+		}
+
 		protected ILogger mLogger = TLogger.Instance;
 
 		private object mSynRcv = new object();
@@ -30,6 +44,7 @@
 		private long mTimeup = -1L;
 
 		private NetProcess[,] mNetProcesses = new NetProcess[128,128];
+		protected NetChecker[,] mNetCheckers = new NetChecker[128,128];
 
 		public RcvHeader OnGenRcvHeader { get; set; }
 		public SendHeader OnGenSendHeader { get; set; }
@@ -63,12 +78,12 @@
 			mHeaderSize = headerSize;
 		}
 
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			DoDisconnect();
 		}
 
-		public void Connect(string hostname, int port)
+		public virtual void Connect(string hostname, int port)
 		{
 			mLogger.Log(string.Format("start connect hostname={0} port={1}", hostname, port));
 
@@ -136,6 +151,8 @@
 						//協定是否接收完畢
 						if (mProcessHeader.Len > mRcvBuffer.Length - mHeaderSize)
 							break;
+
+						mSessionId = mProcessHeader.SessionId;
 
 						mRcvBuffer.Read(temp, 0, mHeaderSize, true);
 						byte[] command = new byte[mProcessHeader.Len];
@@ -320,9 +337,12 @@
 			}
 		}
 
-		public void Register(int mainNo, int subNo, NetProcess process)
+		public void Register(int mainNo, int subNo, NetProcess process, bool isCheck = false)
 		{
 			mNetProcesses[mainNo, subNo] = process;
+
+			if (isCheck)
+				mNetCheckers[mainNo, subNo] = new NetChecker(mainNo, subNo);
 		}
 	}
 }
